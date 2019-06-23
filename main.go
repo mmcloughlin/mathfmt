@@ -28,7 +28,7 @@ func process(filename string) {
 		log.Fatal(err)
 	}
 
-	b, err := Source(src)
+	b, err := Format(src)
 	if err != nil {
 		log.Fatal(err)
 	}

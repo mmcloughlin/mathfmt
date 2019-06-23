@@ -6,8 +6,8 @@ import (
 	"unicode"
 )
 
-// Source processes the source code in b.
-func Source(b []byte) ([]byte, error) {
+// Format processes the source code in b.
+func Format(b []byte) ([]byte, error) {
 	var buf bytes.Buffer
 
 	for len(b) > 0 {
@@ -52,41 +52,66 @@ func comment(w *bytes.Buffer, b []byte) ([]byte, error) {
 	return b, nil
 }
 
+// Exponentiation represents an exponentiation of the form base^e.
+type Exponentiation struct {
+	Base     []byte
+	Exponent []byte
+	Raw      []byte
+}
+
 // exp processes an exponentiation.
 func exp(w *bytes.Buffer, b []byte) ([]byte, error) {
-	// Find the caret.
-	caret := bytes.IndexByte(b, '^')
-	if caret < 0 {
-		return nil, errors.New("expected caret")
-	}
-
-	// Find the end.
-	end := bytes.IndexFunc(b, unicode.IsSpace)
-	if end < 0 {
-		return nil, errors.New("expected whitespace")
-	}
-	if end < caret {
-		return nil, errors.New("unexpected whitespace before caret")
+	e, rest, err := parseexp(b)
+	if err != nil {
+		return nil, err
 	}
 
 	// Is the exponent replaceable with superscripts? If not write out unchanged and return.
-	e := bytes.Runes(b[caret+1 : end])
+	exponent := bytes.Runes(e.Exponent)
 
-	if !replaceable(e, super) {
-		w.Write(b[:end])
-		return b[end:], nil
+	if !replaceable(exponent, super) {
+		w.Write(e.Raw)
+		return rest, nil
 	}
 
-	// Write up to the caret as-is.
-	w.Write(b[:caret])
+	// Write base as-is.
+	w.Write(e.Base)
 
 	// Perform replacement and write out.
-	replacerunes(e, super)
-	for _, r := range e {
+	replacerunes(exponent, super)
+	for _, r := range exponent {
 		w.WriteRune(r)
 	}
 
-	return b[end:], nil
+	return rest, nil
+}
+
+func parseexp(b []byte) (*Exponentiation, []byte, error) {
+	// Find the caret.
+	caret := bytes.IndexByte(b, '^')
+	if caret < 0 {
+		return nil, nil, errors.New("expected caret")
+	}
+
+	// Find the end.
+	end := bytes.IndexFunc(b, func(r rune) bool {
+		return r == '.' || r == ',' || unicode.IsSpace(r)
+	})
+	if end < 0 {
+		return nil, nil, errors.New("expected whitespace")
+	}
+	if end < caret {
+		return nil, nil, errors.New("unexpected whitespace before caret")
+	}
+
+	// Construct the parsed exponentiation expression.
+	e := &Exponentiation{
+		Base:     b[:caret],
+		Exponent: unbrace(b[caret+1 : end]),
+		Raw:      b[:end],
+	}
+
+	return e, b[end:], nil
 }
 
 // prefix reports whether b starts with p.
@@ -109,4 +134,18 @@ func replacerunes(rs []rune, repl map[rune]rune) {
 	for i := range rs {
 		rs[i] = repl[rs[i]]
 	}
+}
+
+// unbrace removes outer braces, if present.
+func unbrace(b []byte) []byte {
+	return trimwrap(b, '{', '}')
+}
+
+// trimwrap removes open and closing characters, if present.
+func trimwrap(b []byte, open, close byte) []byte {
+	n := len(b)
+	if n >= 2 && b[0] == open && b[n-1] == close {
+		b = b[1 : n-1]
+	}
+	return b
 }
