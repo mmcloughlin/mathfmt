@@ -6,6 +6,17 @@ import (
 	"unicode"
 )
 
+// super is the replacement map for superscript characters.
+var super = map[rune]rune{}
+
+func init() {
+	for _, char := range chars {
+		if char.Super != None {
+			super[char.Char] = char.Super
+		}
+	}
+}
+
 // Format processes the source code in b.
 func Format(b []byte) ([]byte, error) {
 	var buf bytes.Buffer
@@ -31,23 +42,36 @@ func Format(b []byte) ([]byte, error) {
 // comment processes a single line comment.
 func comment(w *bytes.Buffer, b []byte) ([]byte, error) {
 	for len(b) > 0 {
-		switch {
 		// Stop at new line.
-		case b[0] == '\n':
+		if b[0] == '\n' {
 			w.WriteByte(b[0])
 			b = b[1:]
 			return b, nil
+		}
+
+		// Look for a replacable symbol.
+		for symbol, r := range symbols {
+			if prefix(b, symbol) {
+				w.WriteRune(r)
+				b = b[len(symbol):]
+				break
+			}
+		}
+
+		// Is this a recognized symbol?
 		// Is this the start of an exponent?
-		case prefix(b, "2^"):
+		if prefix(b, "2^") {
 			rest, err := exp(w, b)
 			if err != nil {
 				return nil, err
 			}
 			b = rest
-		default:
-			w.WriteByte(b[0])
-			b = b[1:]
+			continue
 		}
+
+		// Otherwise consume a byte.
+		w.WriteByte(b[0])
+		b = b[1:]
 	}
 	return b, nil
 }

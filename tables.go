@@ -1,13 +1,16 @@
 package main
 
+// None is the zero rune.
+var None rune
+
+// Character represents a character with its superscript and subscript variants.
 type Character struct {
 	Char  rune
 	Super rune
 	Sub   rune
 }
 
-var None rune
-
+// chars is the table of super/subscriptable characters.
 var chars = []Character{
 	{'0', '\u2070', '\u2080'},
 	{'1', '\u00B9', '\u2081'},
@@ -78,12 +81,9 @@ var chars = []Character{
 	{')', '\u207E', '\u208E'},
 }
 
-var super = map[rune]rune{}
-
-func init() {
-	for _, char := range chars {
-		if char.Super != None {
-			super[char.Char] = char.Super
-		}
-	}
+// symbols defines symbol replacements.
+var symbols = map[string]rune{
+	"==": '\u2261', // IDENTICAL TO
+	"<=": '\u2A7D', // LESS-THAN OR SLANTED EQUAL TO
+	">=": '\u2A7E', // GREATER-THAN OR SLANTED EQUAL TO
 }
