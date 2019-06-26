@@ -7,9 +7,7 @@ import (
 	"os"
 )
 
-var (
-	write = flag.Bool("w", false, "write result to (source) file instead of stdout")
-)
+var write = flag.Bool("w", false, "write result to (source) file instead of stdout")
 
 func main() {
 	log.SetPrefix("mathfmt: ")
