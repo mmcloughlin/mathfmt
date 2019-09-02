@@ -83,6 +83,8 @@ var chars = []Character{
 
 // symbols defines symbol replacements.
 var symbols = map[string]rune{
+	"+-":  '\u00B1', // PLUS-MINUS SIGN
+	"-+":  '\u2213', // MINUS-OR-PLUS SIGN
 	"==":  '\u2261', // IDENTICAL TO
 	"<=":  '\u2A7D', // LESS-THAN OR SLANTED EQUAL TO
 	">=":  '\u2A7E', // GREATER-THAN OR SLANTED EQUAL TO
