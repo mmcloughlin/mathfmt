@@ -83,13 +83,14 @@ var chars = []Character{
 
 // symbols defines symbol replacements.
 var symbols = map[string]rune{
-	"+-":  '\u00B1', // PLUS-MINUS SIGN
-	"-+":  '\u2213', // MINUS-OR-PLUS SIGN
-	"==":  '\u2261', // IDENTICAL TO
-	"<=":  '\u2A7D', // LESS-THAN OR SLANTED EQUAL TO
-	">=":  '\u2A7E', // GREATER-THAN OR SLANTED EQUAL TO
-	"||":  '\u2225', // PARALLEL TO
-	"<-":  '\u2191', // LEFTWARDS ARROW
-	"->":  '\u2192', // RIGHTWARDS ARROW
-	"|->": '\u21a6', // RIGHTWARDS ARROW FROM BAR
+	"+-":      '\u00B1', // PLUS-MINUS SIGN
+	"-+":      '\u2213', // MINUS-OR-PLUS SIGN
+	"==":      '\u2261', // IDENTICAL TO
+	"<=":      '\u2A7D', // LESS-THAN OR SLANTED EQUAL TO
+	">=":      '\u2A7E', // GREATER-THAN OR SLANTED EQUAL TO
+	"||":      '\u2225', // PARALLEL TO
+	"<-":      '\u2191', // LEFTWARDS ARROW
+	"->":      '\u2192', // RIGHTWARDS ARROW
+	"|->":     '\u21a6', // RIGHTWARDS ARROW FROM BAR
+	"\\oplus": '\u2295', // CIRCLED PLUS
 }
