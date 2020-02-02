@@ -1,0 +1,9 @@
+linters:
+  enable-all: true
+  disable:
+    - gochecknoglobals
+    - gochecknoinits
+    - gosec
+
+issues:
+  exclude-use-default: false
