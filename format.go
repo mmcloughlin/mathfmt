@@ -40,7 +40,7 @@ func Format(b []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// macro processes a macro starting at r. Note r points at the character directly after the macro name.
+// macro processes a macro starting at s. Note s begins at the character directly after the macro name.
 func macro(w *bytes.Buffer, s string) (string, error) {
 	if len(s) == 0 {
 		return "", errors.New("empty macro")
@@ -59,6 +59,7 @@ func macro(w *bytes.Buffer, s string) (string, error) {
 	return rest, nil
 }
 
+// Fixed data structures required for formula processing.
 var (
 	replacer *strings.Replacer // replacer for symbols.
 	super    = map[rune]rune{} // replacement map for superscript characters.
@@ -84,7 +85,7 @@ func init() {
 	}
 }
 
-// formula processes a formula in r, writing the result to w.
+// formula processes a formula in s, writing the result to w.
 func formula(w *bytes.Buffer, s string) error {
 	if len(s) == 0 {
 		return nil
@@ -130,6 +131,10 @@ func formula(w *bytes.Buffer, s string) error {
 	return nil
 }
 
+// supsub processes a super/subscript starting at s, writing the result to w.
+// The repl map provides the mapping from runes to the corresponding
+// super/subscripted versions. Note the first character of s should be the "^"
+// or "_" operator.
 func supsub(w *bytes.Buffer, s string, repl map[rune]rune) (string, error) {
 	arg, rest, err := parsearg(s[1:])
 	if err != nil {
@@ -151,6 +156,7 @@ func supsub(w *bytes.Buffer, s string, repl map[rune]rune) (string, error) {
 	return rest, nil
 }
 
+// parsearg parses the argument to a super/subscript.
 func parsearg(s string) (string, string, error) {
 	if len(s) == 0 {
 		return "", "", nil
@@ -178,7 +184,7 @@ func parsearg(s string) (string, string, error) {
 	return s[:i], s[i:], nil
 }
 
-// parsebraces parses matching braces starting at the beginning of r.
+// parsebraces parses matching braces starting at the beginning of s.
 func parsebraces(s string) (string, string, error) {
 	if len(s) == 0 || s[0] != '{' {
 		return "", "", errors.New("expected {")

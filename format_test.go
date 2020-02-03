@@ -56,7 +56,7 @@ func TestFormula(t *testing.T) {
 		{Name: "sup_with_minus", Input: "2^32-1", Expect: "2³²-1"},
 	}
 	for _, c := range cases {
-		c := c // scopeline
+		c := c // scopelint
 		t.Run(c.Name, func(t *testing.T) {
 			buf := bytes.NewBuffer(nil)
 			err := formula(buf, c.Input)

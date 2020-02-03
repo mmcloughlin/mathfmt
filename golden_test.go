@@ -87,12 +87,12 @@ func TestInputsASCII(t *testing.T) {
 
 			// Check for non-ASCII.
 			line := 1
-			for _, c := range string(b) {
+			for _, r := range string(b) {
 				switch {
-				case c == '\n':
+				case r == '\n':
 					line++
-				case c > unicode.MaxASCII:
-					t.Errorf("%d: non-ascii character %c", line, c)
+				case r > unicode.MaxASCII:
+					t.Errorf("%d: non-ascii character %c", line, r)
 				}
 			}
 		})
