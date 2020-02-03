@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // macroname is the name of the macro that applies math formatting.
@@ -93,33 +94,34 @@ func formula(w *bytes.Buffer, s string) error {
 	s = replacer.Replace(s)
 
 	// Replace super/subscripts.
-	r := []rune(s)
 	last := None
-	for len(r) > 0 {
+	for len(s) > 0 {
+		r, size := utf8.DecodeRuneInString(s)
+
 		// Look for a super/subscript character.
 		var repl map[rune]rune
-		switch r[0] {
+		switch r {
 		case '^':
 			repl = super
 		case '_':
 			repl = sub
 		default:
-			w.WriteRune(r[0])
-			last = r[0]
-			r = r[1:]
+			w.WriteRune(r)
+			last = r
+			s = s[size:]
 			continue
 		}
 
 		// Perform replacement.
 		if unicode.IsPrint(last) && !unicode.IsSpace(last) {
 			var err error
-			r, err = supsub(w, r, repl)
+			s, err = supsub(w, s, repl)
 			if err != nil {
 				return err
 			}
 		} else {
-			w.WriteRune(r[0])
-			r = r[1:]
+			w.WriteRune(r)
+			s = s[size:]
 		}
 
 		last = None
@@ -128,50 +130,52 @@ func formula(w *bytes.Buffer, s string) error {
 	return nil
 }
 
-func supsub(w *bytes.Buffer, r []rune, repl map[rune]rune) ([]rune, error) {
-	arg, rest, err := parsearg(r[1:])
+func supsub(w *bytes.Buffer, s string, repl map[rune]rune) (string, error) {
+	arg, rest, err := parsearg(s[1:])
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	// If we could not parse an argument, or its not replaceable, just write the
 	// sub/script operator and return.
 	if len(arg) == 0 || !replaceable(arg, repl) {
-		w.WriteRune(r[0])
-		return r[1:], nil
+		w.WriteByte(s[0])
+		return s[1:], nil
 	}
 
 	// Perform the replacement.
-	replacerunes(arg, repl)
-	w.WriteString(string(arg))
+	for _, r := range arg {
+		w.WriteRune(repl[r])
+	}
 
 	return rest, nil
 }
 
-func parsearg(r []rune) ([]rune, []rune, error) {
-	if len(r) == 0 {
-		return nil, r, nil
+func parsearg(s string) (string, string, error) {
+	if len(s) == 0 {
+		return "", "", nil
 	}
 
 	// Braced.
-	if r[0] == '{' {
-		arg, rest, err := parsebraces(string(r))
+	if s[0] == '{' {
+		arg, rest, err := parsebraces(s)
 		if err != nil {
-			return nil, nil, err
+			return "", "", err
 		}
-		return []rune(arg[1 : len(arg)-1]), []rune(rest), nil
+		return arg[1 : len(arg)-1], rest, nil
 	}
 
-	// Numeral.
+	// Look for a numeral.
 	i := 0
-	for ; i < len(r) && unicode.IsNumber(r[i]); i++ {
+	for ; i < len(s) && '0' <= s[i] && s[i] <= '9'; i++ {
 	}
 	if i > 0 {
-		return r[:i], r[i:], nil
+		return s[:i], s[i:], nil
 	}
 
-	// Default to just one character.
-	return r[:1], r[1:], nil
+	// Default to the first rune.
+	_, i = utf8.DecodeRuneInString(s)
+	return s[:i], s[i:], nil
 }
 
 // parsebraces parses matching braces starting at the beginning of r.
@@ -202,19 +206,12 @@ func parsebraces(s string) (string, string, error) {
 	return "", "", errors.New("unmatched braces")
 }
 
-// replaceable returns whether every rune in rs has a replacement in repl.
-func replaceable(r []rune, repl map[rune]rune) bool {
-	for _, c := range r {
-		if _, ok := repl[c]; !ok {
+// replaceable returns whether every rune in s has a replacement in repl.
+func replaceable(s string, repl map[rune]rune) bool {
+	for _, r := range s {
+		if _, ok := repl[r]; !ok {
 			return false
 		}
 	}
 	return true
-}
-
-// replacerunes replaces runes in rs according to the replacement map.
-func replacerunes(r []rune, repl map[rune]rune) {
-	for i := range r {
-		r[i] = repl[r[i]]
-	}
 }
