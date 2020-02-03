@@ -3,173 +3,221 @@ package main
 import (
 	"bytes"
 	"errors"
+	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
-// super is the replacement map for superscript characters.
-var super = map[rune]rune{}
-
-func init() {
-	for _, char := range chars {
-		if char.Super != None {
-			super[char.Char] = char.Super
-		}
-	}
-}
+// macroname is the name of the macro that applies math formatting.
+const macroname = "\\mathfmt"
 
 // Format processes the source code in b.
 func Format(b []byte) ([]byte, error) {
 	var buf bytes.Buffer
+	s := string(b)
+	for len(s) > 0 {
+		// Look for the next macro.
+		i := strings.Index(s, macroname)
 
-	for len(b) > 0 {
-		switch {
-		// Start of a comment.
-		case prefix(b, "//"):
-			rest, err := comment(&buf, b)
-			if err != nil {
-				return nil, err
-			}
-			b = rest
-		default:
-			buf.WriteByte(b[0])
-			b = b[1:]
+		// Exit if not found.
+		if i < 0 {
+			buf.WriteString(s)
+			break
 		}
+
+		// Write out up to the macro.
+		buf.WriteString(s[:i])
+		s = s[i:]
+
+		// Process the macro.
+		rest, err := macro(&buf, s[len(macroname):])
+		if err != nil {
+			return nil, err
+		}
+		s = rest
 	}
 
 	return buf.Bytes(), nil
 }
 
-// comment processes a single line comment.
-func comment(w *bytes.Buffer, b []byte) ([]byte, error) {
-	for len(b) > 0 {
-		// Stop at new line.
-		if b[0] == '\n' {
-			w.WriteByte(b[0])
-			b = b[1:]
-			return b, nil
-		}
-
-		// Look for a replacable symbol.
-		for symbol, r := range symbols {
-			if prefix(b, symbol) {
-				w.WriteRune(r)
-				b = b[len(symbol):]
-				break
-			}
-		}
-
-		// Is this a recognized symbol?
-		// Is this the start of an exponent?
-		if prefix(b, "2^") {
-			rest, err := exp(w, b)
-			if err != nil {
-				return nil, err
-			}
-			b = rest
-			continue
-		}
-
-		// Otherwise consume a byte.
-		w.WriteByte(b[0])
-		b = b[1:]
+// macro processes a macro starting at s. Note s begins at the character directly after the macro name.
+func macro(w *bytes.Buffer, s string) (string, error) {
+	if len(s) == 0 {
+		return "", errors.New("empty macro")
 	}
-	return b, nil
-}
 
-// Exponentiation represents an exponentiation of the form base^e.
-type Exponentiation struct {
-	Base     []byte
-	Exponent []byte
-	Raw      []byte
-}
-
-// exp processes an exponentiation.
-func exp(w *bytes.Buffer, b []byte) ([]byte, error) {
-	e, rest, err := parseexp(b)
+	arg, rest, err := parsebraces(s)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	// Is the exponent replaceable with superscripts? If not write out unchanged and return.
-	exponent := bytes.Runes(e.Exponent)
-
-	if !replaceable(exponent, super) {
-		w.Write(e.Raw)
-		return rest, nil
-	}
-
-	// Write base as-is.
-	w.Write(e.Base)
-
-	// Perform replacement and write out.
-	replacerunes(exponent, super)
-	for _, r := range exponent {
-		w.WriteRune(r)
+	n := len(arg)
+	if err := formula(w, arg[1:n-1]); err != nil {
+		return "", err
 	}
 
 	return rest, nil
 }
 
-func parseexp(b []byte) (*Exponentiation, []byte, error) {
-	// Find the caret.
-	caret := bytes.IndexByte(b, '^')
-	if caret < 0 {
-		return nil, nil, errors.New("expected caret")
-	}
+// Fixed data structures required for formula processing.
+var (
+	replacer *strings.Replacer // replacer for symbols.
+	super    = map[rune]rune{} // replacement map for superscript characters.
+	sub      = map[rune]rune{} // replacement map for subscript characters.
+)
 
-	// Find the end.
-	end := bytes.IndexFunc(b, func(r rune) bool {
-		return r == '.' || r == ',' || unicode.IsSpace(r)
-	})
-	if end < 0 {
-		return nil, nil, errors.New("expected whitespace")
+func init() {
+	// Build symbol replacer.
+	var oldnew []string
+	for symbol, r := range symbols {
+		oldnew = append(oldnew, symbol, string([]rune{r}))
 	}
-	if end < caret {
-		return nil, nil, errors.New("unexpected whitespace before caret")
-	}
+	replacer = strings.NewReplacer(oldnew...)
 
-	// Construct the parsed exponentiation expression.
-	e := &Exponentiation{
-		Base:     b[:caret],
-		Exponent: unbrace(b[caret+1 : end]),
-		Raw:      b[:end],
+	// Build super/subscript replacement maps.
+	for _, char := range chars {
+		if char.Super != None {
+			super[char.Char] = char.Super
+		}
+		if char.Sub != None {
+			sub[char.Char] = char.Sub
+		}
 	}
-
-	return e, b[end:], nil
 }
 
-// prefix reports whether b starts with p.
-func prefix(b []byte, p string) bool {
-	return bytes.HasPrefix(b, []byte(p))
+// formula processes a formula in s, writing the result to w.
+func formula(w *bytes.Buffer, s string) error {
+	if len(s) == 0 {
+		return nil
+	}
+
+	// Replace symbols.
+	s = replacer.Replace(s)
+
+	// Replace super/subscripts.
+	last := None
+	for len(s) > 0 {
+		r, size := utf8.DecodeRuneInString(s)
+
+		// Look for a super/subscript character.
+		var repl map[rune]rune
+		switch r {
+		case '^':
+			repl = super
+		case '_':
+			repl = sub
+		default:
+			w.WriteRune(r)
+			last = r
+			s = s[size:]
+			continue
+		}
+
+		// Perform replacement.
+		if unicode.IsPrint(last) && !unicode.IsSpace(last) {
+			var err error
+			s, err = supsub(w, s, repl)
+			if err != nil {
+				return err
+			}
+		} else {
+			w.WriteRune(r)
+			s = s[size:]
+		}
+
+		last = None
+	}
+
+	return nil
 }
 
-// replaceable returns whether every rune in rs has a replacement in repl.
-func replaceable(rs []rune, repl map[rune]rune) bool {
-	for _, r := range rs {
+// supsub processes a super/subscript starting at s, writing the result to w.
+// The repl map provides the mapping from runes to the corresponding
+// super/subscripted versions. Note the first character of s should be the "^"
+// or "_" operator.
+func supsub(w *bytes.Buffer, s string, repl map[rune]rune) (string, error) {
+	arg, rest, err := parsearg(s[1:])
+	if err != nil {
+		return "", err
+	}
+
+	// If we could not parse an argument, or its not replaceable, just write the
+	// sub/script operator and return.
+	if len(arg) == 0 || !replaceable(arg, repl) {
+		w.WriteByte(s[0])
+		return s[1:], nil
+	}
+
+	// Perform the replacement.
+	for _, r := range arg {
+		w.WriteRune(repl[r])
+	}
+
+	return rest, nil
+}
+
+// parsearg parses the argument to a super/subscript.
+func parsearg(s string) (string, string, error) {
+	if len(s) == 0 {
+		return "", "", nil
+	}
+
+	// Braced.
+	if s[0] == '{' {
+		arg, rest, err := parsebraces(s)
+		if err != nil {
+			return "", "", err
+		}
+		return arg[1 : len(arg)-1], rest, nil
+	}
+
+	// Look for a numeral.
+	i := 0
+	for ; i < len(s) && '0' <= s[i] && s[i] <= '9'; i++ {
+	}
+	if i > 0 {
+		return s[:i], s[i:], nil
+	}
+
+	// Default to the first rune.
+	_, i = utf8.DecodeRuneInString(s)
+	return s[:i], s[i:], nil
+}
+
+// parsebraces parses matching braces starting at the beginning of s.
+func parsebraces(s string) (string, string, error) {
+	if len(s) == 0 || s[0] != '{' {
+		return "", "", errors.New("expected {")
+	}
+
+	depth := 0
+	for i, r := range s {
+		// Adjust depth if we see open or close brace.
+		switch r {
+		case '{':
+			depth++
+		case '}':
+			depth--
+		}
+
+		// Continue if we have not reached matched braces.
+		if depth > 0 {
+			continue
+		}
+
+		// Return the matched braces.
+		return s[:i+1], s[i+1:], nil
+	}
+
+	return "", "", errors.New("unmatched braces")
+}
+
+// replaceable returns whether every rune in s has a replacement in repl.
+func replaceable(s string, repl map[rune]rune) bool {
+	for _, r := range s {
 		if _, ok := repl[r]; !ok {
 			return false
 		}
 	}
 	return true
-}
-
-// replacerunes replaces runes in rs according to the replacement map.
-func replacerunes(rs []rune, repl map[rune]rune) {
-	for i := range rs {
-		rs[i] = repl[rs[i]]
-	}
-}
-
-// unbrace removes outer braces, if present.
-func unbrace(b []byte) []byte {
-	return trimwrap(b, '{', '}')
-}
-
-// trimwrap removes open and closing characters, if present.
-func trimwrap(b []byte, open, close byte) []byte {
-	n := len(b)
-	if n >= 2 && b[0] == open && b[n-1] == close {
-		b = b[1 : n-1]
-	}
-	return b
 }
