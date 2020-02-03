@@ -18,13 +18,13 @@ type TestCase struct {
 	Golden string
 }
 
-func LoadTestCases(t *testing.T) []TestCase {
-	t.Helper()
+func LoadTestCases(tb testing.TB) []TestCase {
+	tb.Helper()
 
 	ext := ".in"
 	inputs, err := filepath.Glob("testdata/*" + ext)
 	if err != nil {
-		t.Fatal(err)
+		tb.Fatal(err)
 	}
 
 	var cases []TestCase
@@ -40,7 +40,7 @@ func LoadTestCases(t *testing.T) []TestCase {
 	return cases
 }
 
-func TestGolden(t *testing.T) {
+func TestFormatGolden(t *testing.T) {
 	for _, c := range LoadTestCases(t) {
 		c := c // scopelint
 		t.Run(c.Name, func(t *testing.T) {
@@ -119,5 +119,23 @@ func AssertOutputEquals(t *testing.T, expect, got []byte) {
 		if expectlines[i] != gotlines[i] {
 			t.Errorf("line %d:\n\tgot    = %q\n\texpect = %q", i+1, gotlines[i], expectlines[i])
 		}
+	}
+}
+
+func BenchmarkFormatGolden(b *testing.B) {
+	for _, c := range LoadTestCases(b) {
+		c := c // scopelint
+		b.Run(c.Name, func(b *testing.B) {
+			// Read input.
+			src, err := ioutil.ReadFile(c.Input)
+			if err != nil {
+				b.Fatal(err)
+			}
+
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				Format(src)
+			}
+		})
 	}
 }

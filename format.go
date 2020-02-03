@@ -13,38 +13,46 @@ const macroname = "\\mathfmt"
 // Format processes the source code in b.
 func Format(b []byte) ([]byte, error) {
 	var buf bytes.Buffer
-	r := []rune(string(b))
-	for len(r) > 0 {
-		switch {
-		case prefix(r, macroname):
-			rest, err := macro(&buf, r[len(macroname):])
-			if err != nil {
-				return nil, err
-			}
-			r = rest
-		default:
-			buf.WriteRune(r[0])
-			r = r[1:]
+	s := string(b)
+	for len(s) > 0 {
+		// Look for the next macro.
+		i := strings.Index(s, macroname)
+
+		// Exit if not found.
+		if i < 0 {
+			buf.WriteString(s)
+			break
 		}
+
+		// Write out up to the macro.
+		buf.WriteString(s[:i])
+		s = s[i:]
+
+		// Process the macro.
+		rest, err := macro(&buf, s[len(macroname):])
+		if err != nil {
+			return nil, err
+		}
+		s = rest
 	}
 
 	return buf.Bytes(), nil
 }
 
 // macro processes a macro starting at r. Note r points at the character directly after the macro name.
-func macro(w *bytes.Buffer, r []rune) ([]rune, error) {
-	if len(r) == 0 {
-		return nil, errors.New("empty macro")
+func macro(w *bytes.Buffer, s string) (string, error) {
+	if len(s) == 0 {
+		return "", errors.New("empty macro")
 	}
 
-	arg, rest, err := parsebraces(r)
+	arg, rest, err := parsebraces(s)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	n := len(arg)
 	if err := formula(w, arg[1:n-1]); err != nil {
-		return nil, err
+		return "", err
 	}
 
 	return rest, nil
@@ -76,15 +84,16 @@ func init() {
 }
 
 // formula processes a formula in r, writing the result to w.
-func formula(w *bytes.Buffer, r []rune) error {
-	if len(r) == 0 {
+func formula(w *bytes.Buffer, s string) error {
+	if len(s) == 0 {
 		return nil
 	}
 
 	// Replace symbols.
-	r = []rune(replacer.Replace(string(r)))
+	s = replacer.Replace(s)
 
 	// Replace super/subscripts.
+	r := []rune(s)
 	last := None
 	for len(r) > 0 {
 		// Look for a super/subscript character.
@@ -146,11 +155,11 @@ func parsearg(r []rune) ([]rune, []rune, error) {
 
 	// Braced.
 	if r[0] == '{' {
-		arg, rest, err := parsebraces(r)
+		arg, rest, err := parsebraces(string(r))
 		if err != nil {
 			return nil, nil, err
 		}
-		return arg[1 : len(arg)-1], rest, nil
+		return []rune(arg[1 : len(arg)-1]), []rune(rest), nil
 	}
 
 	// Numeral.
@@ -165,21 +174,16 @@ func parsearg(r []rune) ([]rune, []rune, error) {
 	return r[:1], r[1:], nil
 }
 
-// prefix reports whether rs starts with p.
-func prefix(r []rune, p string) bool {
-	return strings.HasPrefix(string(r), p)
-}
-
 // parsebraces parses matching braces starting at the beginning of r.
-func parsebraces(r []rune) ([]rune, []rune, error) {
-	if len(r) == 0 || r[0] != '{' {
-		return nil, nil, errors.New("expected {")
+func parsebraces(s string) (string, string, error) {
+	if len(s) == 0 || s[0] != '{' {
+		return "", "", errors.New("expected {")
 	}
 
 	depth := 0
-	for i := 0; i < len(r); i++ {
+	for i, r := range s {
 		// Adjust depth if we see open or close brace.
-		switch r[i] {
+		switch r {
 		case '{':
 			depth++
 		case '}':
@@ -191,11 +195,11 @@ func parsebraces(r []rune) ([]rune, []rune, error) {
 			continue
 		}
 
-		// Process the macro and exit.
-		return r[:i+1], r[i+1:], nil
+		// Return the matched braces.
+		return s[:i+1], s[i+1:], nil
 	}
 
-	return nil, nil, errors.New("unmatched braces")
+	return "", "", errors.New("unmatched braces")
 }
 
 // replaceable returns whether every rune in rs has a replacement in repl.

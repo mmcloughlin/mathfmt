@@ -59,7 +59,7 @@ func TestFormula(t *testing.T) {
 		c := c // scopeline
 		t.Run(c.Name, func(t *testing.T) {
 			buf := bytes.NewBuffer(nil)
-			err := formula(buf, []rune(c.Input))
+			err := formula(buf, c.Input)
 			if err != nil {
 				t.Fatal(err)
 			}
