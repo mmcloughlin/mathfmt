@@ -134,7 +134,7 @@ func BenchmarkFormatGolden(b *testing.B) {
 
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				Format(src)
+				_, _ = Format(src)
 			}
 		})
 	}

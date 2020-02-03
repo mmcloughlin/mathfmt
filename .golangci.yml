@@ -4,6 +4,11 @@ linters:
     - gochecknoglobals
     - gochecknoinits
     - gosec
+    - prealloc
+
+linters-settings:
+  funlen:
+    lines: 80
 
 issues:
   exclude-use-default: false
