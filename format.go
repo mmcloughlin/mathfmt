@@ -146,7 +146,11 @@ func parsearg(r []rune) ([]rune, []rune, error) {
 
 	// Braced.
 	if r[0] == '{' {
-		return parsebraces(r)
+		arg, rest, err := parsebraces(r)
+		if err != nil {
+			return nil, nil, err
+		}
+		return arg[1 : len(arg)-1], rest, nil
 	}
 
 	// Numeral.
