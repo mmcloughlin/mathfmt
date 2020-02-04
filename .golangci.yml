@@ -5,10 +5,7 @@ linters:
     - gochecknoinits
     - gosec
     - prealloc
-
-linters-settings:
-  funlen:
-    lines: 80
+    - funlen
 
 issues:
   exclude-use-default: false
