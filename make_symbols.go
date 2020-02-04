@@ -321,7 +321,7 @@ func MacrosFromSymbols(symbols []Symbol) []Macro {
 	return macros
 }
 
-// Include reports whether symbol should be in mathfmt.
+// IncludeSymbol reports whether symbol should be in mathfmt.
 func IncludeSymbol(symbol Symbol) bool {
 	// Skip unprintable characters (various types of spaces and invisible characters).
 	if !unicode.IsPrint(symbol.Char) {
@@ -330,11 +330,7 @@ func IncludeSymbol(symbol Symbol) bool {
 
 	// Single character commands don't serve any purpose.
 	cmd := SymbolCommand(symbol)
-	if len(cmd) < 2 {
-		return false
-	}
-
-	return true
+	return len(cmd) >= 2
 }
 
 // SymbolCommand returns the preferred command for a symbol.

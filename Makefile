@@ -13,6 +13,7 @@ unimathsymbols.txt:
 .PHONY: lint
 lint:
 	golangci-lint run
+	golangci-lint run make_symbols.go
 
 .PHONY: bootstrap
 bootstrap:
