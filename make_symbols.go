@@ -428,7 +428,13 @@ func Documentation(macros []Macro) ([]byte, error) {
 
 	// Output.
 	buf := bytes.NewBuffer(nil)
-	fmt.Fprint(buf, "# Symbols Reference\n")
+
+	fmt.Fprint(buf, "# Symbols Reference\n\n")
+	for _, section := range sections {
+		anchor := strings.ReplaceAll(strings.ToLower(section.Name), " ", "-")
+		fmt.Fprintf(buf, "* [%s](#%s)\n", section.Name, anchor)
+	}
+
 	for _, section := range sections {
 		if len(sectionmacros[section.ID]) == 0 {
 			return nil, fmt.Errorf("no macros in section %q", section.ID)

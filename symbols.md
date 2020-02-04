@@ -1,5 +1,20 @@
 # Symbols Reference
 
+* [Aliases](#aliases)
+* [Opening Symbols](#opening-symbols)
+* [Closing Symbols](#closing-symbols)
+* [Fence Symbols](#fence-symbols)
+* [Punctuation Symbols](#punctuation-symbols)
+* [Over Symbols](#over-symbols)
+* [Under Symbols](#under-symbols)
+* [Accents](#accents)
+* [Big Operators](#big-operators)
+* [Radicals](#radicals)
+* [Binary relations](#binary-relations)
+* [Ordinary Symbols](#ordinary-symbols)
+* [Relation Symbols](#relation-symbols)
+* [Alphabetical Symbols](#alphabetical-symbols)
+
 ## Aliases
 
 | Code | Char | Command | Character Name |
