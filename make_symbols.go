@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 var (
@@ -26,24 +27,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for _, symbol := range symbols {
-		fmt.Println(symbol)
+	for _, symbol := range FilterSymbols(symbols) {
+		fmt.Printf("%c\tcategory=%s\tlatex=%s\tname=%s\n", symbol.Char, symbol.TeXCategory, symbol.LaTeXCommand, symbol.CharacterName)
 	}
 }
 
 type Symbol struct {
-	Char             rune
-	LaTeXCommand     string
-	UnicodeMathClass string
-	TeXCategory      string
-	Requirements     []string
-	Conflicts        []string
-	Aliases          []string
-	Approx           []string
-	SeeAlso          []string
-	TextMode         []string
-	Comments         []string
-	CharacterName    string
+	Char               rune
+	LaTeXCommand       string
+	UnicodeMathCommand string
+	UnicodeMathClass   string
+	TeXCategory        string
+	Requirements       []string
+	Conflicts          []string
+	Aliases            []string
+	Approx             []string
+	SeeAlso            []string
+	TextMode           []string
+	Comments           []string
+	CharacterName      string
 }
 
 func LoadSymbolsFile(filename string) ([]Symbol, error) {
@@ -89,7 +91,7 @@ func parsesymbol(line string) (Symbol, error) {
 
 	symbol := Symbol{}
 
-	// 1. code point (Unicode character number)
+	// Code point (Unicode character number)
 	//
 	//    There may be more than one record for one code point,
 	//    if there are different TeX commands for the same character.
@@ -101,18 +103,19 @@ func parsesymbol(line string) (Symbol, error) {
 	}
 	symbol.Char = rune(codepoint)
 
-	// 2. literal character (UTF-8 encoded)
+	// Literal character (UTF-8 encoded)
 
 	// We already have this from the codepoint.
 
-	// 3. (La)TeX _`command`
+	// (La)TeX _`command`
 	//
 	//    Preferred representation of the character in (La)TeX.
 	//    Alternative commands are listed in the comments_ field.
 
 	symbol.LaTeXCommand = fields[2]
+	symbol.UnicodeMathCommand = fields[3]
 
-	// 4. Unicode math character class (after MathClassEx_).
+	// Unicode math character class (after MathClassEx_).
 	//
 	//    .. _MathClassEx:
 	//       http://www.unicode.org/Public/math/revision-11/MathClassEx-11.txt
@@ -140,16 +143,16 @@ func parsesymbol(line string) (Symbol, error) {
 	//    comments. The classes are also useful in determining extra spacing
 	//    around the operators as discussed in UTR#25.
 
-	symbol.UnicodeMathClass = fields[3]
+	symbol.UnicodeMathClass = fields[4]
 
-	// 5. TeX math category (after unimath-symbols_)
+	// TeX math category (after unimath-symbols_)
 	//
 	//    .. _unimath-symbols:
 	//       http://mirror.ctan.org/macros/latex/contrib/unicode-math/unimath-symbols.pdf
 
-	symbol.TeXCategory = fields[4]
+	symbol.TeXCategory = fields[5]
 
-	// 6. requirements and conflicts
+	// Requirements and Conflicts
 	//
 	//    Space delimited list of LaTeX packages or features [1]_ providing
 	//    the LaTeX command_ or conflicting with it.
@@ -165,7 +168,7 @@ func parsesymbol(line string) (Symbol, error) {
 	//    	    (e.g. ``mathbb`` or ``slantedGreek``) or a constraint (e.g.
 	//	    ``literal`` mapping plain characters to upright face).
 
-	for _, feature := range strings.Fields(fields[5]) {
+	for _, feature := range strings.Fields(fields[6]) {
 		if feature[0] == '-' {
 			symbol.Conflicts = append(symbol.Conflicts, feature[1:])
 		} else {
@@ -173,7 +176,7 @@ func parsesymbol(line string) (Symbol, error) {
 		}
 	}
 
-	// 8. descriptive _`comments`
+	// Descriptive _`comments`
 	//
 	//    The descriptive comments provide more information about the
 	//    character, or its specific appearance or use.
@@ -210,4 +213,37 @@ func parsesymbol(line string) (Symbol, error) {
 	}
 
 	return symbol, nil
+}
+
+// FilterSymbols filters the list of symbols to those we want to include in mathfmt.
+func FilterSymbols(symbols []Symbol) []Symbol {
+	selected := make([]Symbol, 0, len(symbols))
+	for _, symbol := range symbols {
+		if IncludeSymbol(symbol) {
+			selected = append(selected, symbol)
+		}
+	}
+	return selected
+}
+
+// Include reports whether symbol should be in mathfmt.
+func IncludeSymbol(symbol Symbol) bool {
+	str := string([]rune{symbol.Char})
+
+	// Skip unprintable characters (various types of spaces and invisible characters).
+	if !unicode.IsPrint(symbol.Char) {
+		return false
+	}
+
+	// We want symbols with a command.
+	if symbol.LaTeXCommand == "" {
+		return false
+	}
+
+	// Exclude the cases where the command is the actual character.
+	if str == symbol.LaTeXCommand {
+		return false
+	}
+
+	return true
 }
