@@ -432,9 +432,10 @@ func Documentation(macros []Macro) ([]byte, error) {
 		}
 		fmt.Fprintf(buf, "\n## %s\n\n", section.Name)
 
-		fmt.Fprint(buf, "| Char | Command | Character Name |\n")
-		fmt.Fprint(buf, "| --- | --- | --- |\n")
+		fmt.Fprint(buf, "| Code | Char | Command | Character Name |\n")
+		fmt.Fprint(buf, "| ---:|:---:| --- | --- |\n")
 		for _, m := range sectionmacros[section.ID] {
+			fmt.Fprintf(buf, "| [`%04X`](https://decodeunicode.org/U+%04X) ", m.Char, m.Char)
 			fmt.Fprintf(buf, "| `%c` ", m.Char)
 			fmt.Fprintf(buf, "| `%s` ", strings.ReplaceAll(m.Command, "|", `\|`))
 			fmt.Fprintf(buf, "| %s ", m.CharacterName)
