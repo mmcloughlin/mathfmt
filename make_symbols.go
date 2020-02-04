@@ -274,17 +274,25 @@ type Macro struct {
 	CharacterName string
 }
 
-// MacrosFromSymbols filters the list of symbols down to a list of macros.
+// MacrosFromSymbols filters the list of symbols down to a list of macros. When
+// multiple symbols have the same preferred command, the first in order will be
+// kept.
 func MacrosFromSymbols(symbols []Symbol) []Macro {
 	macros := make([]Macro, 0, len(symbols))
+	seen := map[string]bool{}
 	for _, symbol := range symbols {
-		if IncludeSymbol(symbol) {
+		if !IncludeSymbol(symbol) {
+			continue
+		}
+		cmd := SymbolCommand(symbol)
+		if !seen[cmd] {
 			macros = append(macros, Macro{
-				Command:       SymbolCommand(symbol),
+				Command:       cmd,
 				Char:          symbol.Char,
 				Section:       symbol.TeXCategory,
 				CharacterName: symbol.CharacterName,
 			})
+			seen[cmd] = true
 		}
 	}
 	return macros
