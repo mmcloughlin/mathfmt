@@ -10,6 +10,10 @@ symbols.md: make_symbols.go unimathsymbols.txt
 unimathsymbols.txt:
 	wget http://milde.users.sourceforge.net/LUCR/Math/data/unimathsymbols.txt
 
+.PHONY: clean
+clean:
+	$(RM) unimathsymbols.txt
+
 .PHONY: lint
 lint:
 	golangci-lint run

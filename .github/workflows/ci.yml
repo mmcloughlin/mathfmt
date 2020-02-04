@@ -46,7 +46,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v1
     - name: Generate Symbols
-      run: make symbols
+      run: make symbols clean
     - name: Git Status
       run: |
         git diff
