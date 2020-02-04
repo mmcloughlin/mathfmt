@@ -40,6 +40,7 @@ var (
 
 var generators = map[string]Generator{
 	"table": GoTable("main", "symbols"),
+	"doc":   Documentation,
 }
 
 func mainerr() error {
@@ -311,4 +312,59 @@ func GoTable(pkg, varname string) Generator {
 		fmt.Fprint(buf, "}\n")
 		return format.Source(buf.Bytes())
 	})
+}
+
+// sections in the documentation.
+var sections = []struct {
+	ID   string
+	Name string
+}{
+	{"mathopen", "Opening Symbols"},  // 1
+	{"mathclose", "Closing Symbols"}, // 2
+	{"mathfence", "Fence Symbols"},   // 3
+	{"mathover", "Over Symbols"},     // 5
+	{"mathunder", "Under Symbols"},   // 6
+	{"mathaccent", "Accents"},        // 7
+	{"mathop", "Big Operators"},      // 9
+	{"mathradical", "Radicals"},
+	{"mathbin", "Binary relations"},       // 10
+	{"mathord", "Ordinary Symbols"},       // 11
+	{"mathrel", "Relation Symbols"},       // 12
+	{"mathalpha", "Alphabetical Symbols"}, // 13
+}
+
+// Documentation generates markdown documentation for the symbols.
+func Documentation(symbols []Symbol) ([]byte, error) {
+	// Set of defined sections.
+	defined := map[string]bool{}
+	for _, section := range sections {
+		defined[section.ID] = true
+	}
+
+	// Divide by section.
+	sectionsymbols := map[string][]Symbol{}
+	for _, symbol := range symbols {
+		id := symbol.TeXCategory
+		if !defined[id] {
+			return nil, fmt.Errorf("unknown section %q", id)
+		}
+		sectionsymbols[id] = append(sectionsymbols[id], symbol)
+	}
+
+	// Output.
+	buf := bytes.NewBuffer(nil)
+	fmt.Fprint(buf, "# Symbols Reference\n")
+	for _, section := range sections {
+		if len(sectionsymbols[section.ID]) == 0 {
+			continue
+		}
+		fmt.Fprintf(buf, "\n## %s\n\n", section.Name)
+
+		fmt.Fprint(buf, "| Char | Command | Character Name |\n")
+		fmt.Fprint(buf, "| --- | --- | --- |\n")
+		for _, symbol := range sectionsymbols[section.ID] {
+			fmt.Fprintf(buf, "| `%c` | `%s` | %s |\n", symbol.Char, SymbolCommand(symbol), symbol.CharacterName)
+		}
+	}
+	return buf.Bytes(), nil
 }
