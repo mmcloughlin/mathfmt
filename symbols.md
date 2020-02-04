@@ -7,9 +7,9 @@
 | `±` | `+-` |  |
 | `←` | `<-` |  |
 | `→` | `->` |  |
-| `↦` | `|->` |  |
+| `↦` | `\|->` |  |
 | `∓` | `-+` | MINUS-OR-PLUS SIGN |
-| `∥` | `||` |  |
+| `∥` | `\|\|` |  |
 | `≡` | `==` |  |
 | `⩽` | `<=` | LESS-THAN OR SLANTED EQUAL TO |
 | `⩾` | `>=` | GREATER-THAN OR SLANTED EQUAL TO |
@@ -83,7 +83,7 @@
 
 | Char | Command | Character Name |
 | --- | --- | --- |
-| `‖` | `\|` |  |
+| `‖` | `\\|` |  |
 | `⦀` | `\VERT` | TRIPLE VERTICAL BAR DELIMITER |
 
 ## Over Symbols

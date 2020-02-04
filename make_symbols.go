@@ -439,7 +439,10 @@ func Documentation(macros []Macro) ([]byte, error) {
 		fmt.Fprint(buf, "| Char | Command | Character Name |\n")
 		fmt.Fprint(buf, "| --- | --- | --- |\n")
 		for _, m := range sectionmacros[section.ID] {
-			fmt.Fprintf(buf, "| `%c` | `%s` | %s |\n", m.Char, m.Command, m.CharacterName)
+			fmt.Fprintf(buf, "| `%c` ", m.Char)
+			fmt.Fprintf(buf, "| `%s` ", strings.ReplaceAll(m.Command, "|", `\|`))
+			fmt.Fprintf(buf, "| %s ", m.CharacterName)
+			fmt.Fprint(buf, "|\n")
 		}
 	}
 	return buf.Bytes(), nil
