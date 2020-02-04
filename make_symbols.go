@@ -292,16 +292,14 @@ func MacrosFromSymbols(symbols []Symbol) []Macro {
 
 // Include reports whether symbol should be in mathfmt.
 func IncludeSymbol(symbol Symbol) bool {
-	str := string([]rune{symbol.Char})
-
 	// Skip unprintable characters (various types of spaces and invisible characters).
 	if !unicode.IsPrint(symbol.Char) {
 		return false
 	}
 
-	// We want symbols with a command, that's not just the same as the character itself.
+	// Single character commands don't serve any purpose.
 	cmd := SymbolCommand(symbol)
-	if cmd == "" || str == cmd {
+	if len(cmd) < 2 {
 		return false
 	}
 
