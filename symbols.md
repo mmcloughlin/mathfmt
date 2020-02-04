@@ -18,6 +18,7 @@
 
 | Code | Char | Command | Character Name |
 | ---:|:---:| --- | --- |
+| [`0028`](https://decodeunicode.org/U+0028) | `(` | `\lparen` | LEFT PARENTHESIS |
 | [`005B`](https://decodeunicode.org/U+005B) | `[` | `\lbrack` | LEFT SQUARE BRACKET |
 | [`007B`](https://decodeunicode.org/U+007B) | `{` | `\{` | LEFT CURLY BRACKET |
 | [`2308`](https://decodeunicode.org/U+2308) | `⌈` | `\lceil` | LEFT CEILING |
@@ -51,6 +52,7 @@
 
 | Code | Char | Command | Character Name |
 | ---:|:---:| --- | --- |
+| [`0029`](https://decodeunicode.org/U+0029) | `)` | `\rparen` | RIGHT PARENTHESIS |
 | [`005D`](https://decodeunicode.org/U+005D) | `]` | `\rbrack` | RIGHT SQUARE BRACKET |
 | [`007D`](https://decodeunicode.org/U+007D) | `}` | `\}` | RIGHT CURLY BRACKET |
 | [`2309`](https://decodeunicode.org/U+2309) | `⌉` | `\rceil` | RIGHT CEILING |
@@ -83,8 +85,18 @@
 
 | Code | Char | Command | Character Name |
 | ---:|:---:| --- | --- |
+| [`007C`](https://decodeunicode.org/U+007C) | `|` | `\vert` |  |
 | [`2016`](https://decodeunicode.org/U+2016) | `‖` | `\\|` |  |
 | [`2980`](https://decodeunicode.org/U+2980) | `⦀` | `\VERT` | TRIPLE VERTICAL BAR DELIMITER |
+
+## Punctuation Symbols
+
+| Code | Char | Command | Character Name |
+| ---:|:---:| --- | --- |
+| [`0021`](https://decodeunicode.org/U+0021) | `!` | `\exclam` | EXCLAMATION MARK |
+| [`002C`](https://decodeunicode.org/U+002C) | `,` | `\comma` | COMMA |
+| [`003A`](https://decodeunicode.org/U+003A) | `:` | `\mathcolon` |  |
+| [`003B`](https://decodeunicode.org/U+003B) | `;` | `\semicolon` |  |
 
 ## Over Symbols
 
@@ -215,13 +227,14 @@
 | Code | Char | Command | Character Name |
 | ---:|:---:| --- | --- |
 | [`221A`](https://decodeunicode.org/U+221A) | `√` | `\sqrt` |  |
-| [`221B`](https://decodeunicode.org/U+221B) | `∛` | `\sqrt[3]` | CUBE ROOT |
-| [`221C`](https://decodeunicode.org/U+221C) | `∜` | `\sqrt[4]` | FOURTH ROOT |
+| [`221B`](https://decodeunicode.org/U+221B) | `∛` | `\cuberoot` | CUBE ROOT |
+| [`221C`](https://decodeunicode.org/U+221C) | `∜` | `\fourthroot` | FOURTH ROOT |
 
 ## Binary relations
 
 | Code | Char | Command | Character Name |
 | ---:|:---:| --- | --- |
+| [`002B`](https://decodeunicode.org/U+002B) | `+` | `\plus` | PLUS SIGN |
 | [`00B1`](https://decodeunicode.org/U+00B1) | `±` | `\pm` |  |
 | [`00B7`](https://decodeunicode.org/U+00B7) | `·` | `\cdotp` |  |
 | [`00D7`](https://decodeunicode.org/U+00D7) | `×` | `\times` | MULTIPLICATION SIGN |
@@ -232,6 +245,7 @@
 | [`2040`](https://decodeunicode.org/U+2040) | `⁀` | `\cat` | CHARACTER TIE |
 | [`2044`](https://decodeunicode.org/U+2044) | `⁄` | `\fracslash` | FRACTION SLASH |
 | [`214B`](https://decodeunicode.org/U+214B) | `⅋` | `\invamp` | TURNED AMPERSAND |
+| [`2212`](https://decodeunicode.org/U+2212) | `−` | `\minus` | MINUS SIGN |
 | [`2213`](https://decodeunicode.org/U+2213) | `∓` | `\mp` | MINUS-OR-PLUS SIGN |
 | [`2214`](https://decodeunicode.org/U+2214) | `∔` | `\dotplus` |  |
 | [`2215`](https://decodeunicode.org/U+2215) | `∕` | `\slash` | DIVISION SLASH |
@@ -415,6 +429,9 @@
 | [`0024`](https://decodeunicode.org/U+0024) | `$` | `\$` | DOLLAR SIGN |
 | [`0025`](https://decodeunicode.org/U+0025) | `%` | `\%` | PERCENT SIGN |
 | [`0026`](https://decodeunicode.org/U+0026) | `&` | `\&` |  |
+| [`002F`](https://decodeunicode.org/U+002F) | `/` | `\mathslash` | SOLIDUS |
+| [`003F`](https://decodeunicode.org/U+003F) | `?` | `\question` | QUESTION MARK |
+| [`0040`](https://decodeunicode.org/U+0040) | `@` | `\atsign` |  |
 | [`005C`](https://decodeunicode.org/U+005C) | `\` | `\backslash` | REVERSE SOLIDUS |
 | [`005E`](https://decodeunicode.org/U+005E) | `^` | `\sphat` | CIRCUMFLEX ACCENT |
 | [`005F`](https://decodeunicode.org/U+005F) | `_` | `\_` | LOW LINE |
@@ -913,6 +930,9 @@
 
 | Code | Char | Command | Character Name |
 | ---:|:---:| --- | --- |
+| [`003C`](https://decodeunicode.org/U+003C) | `<` | `\less` |  |
+| [`003D`](https://decodeunicode.org/U+003D) | `=` | `\equal` |  |
+| [`003E`](https://decodeunicode.org/U+003E) | `>` | `\greater` |  |
 | [`2050`](https://decodeunicode.org/U+2050) | `⁐` | `\closure` |  |
 | [`2190`](https://decodeunicode.org/U+2190) | `←` | `\leftarrow` |  |
 | [`2191`](https://decodeunicode.org/U+2191) | `↑` | `\uparrow` |  |
@@ -1010,6 +1030,7 @@
 | [`2224`](https://decodeunicode.org/U+2224) | `∤` | `\nmid` | DOES NOT DIVIDE |
 | [`2225`](https://decodeunicode.org/U+2225) | `∥` | `\parallel` |  |
 | [`2226`](https://decodeunicode.org/U+2226) | `∦` | `\nparallel` |  |
+| [`2236`](https://decodeunicode.org/U+2236) | `∶` | `\mathratio` | RATIO |
 | [`2237`](https://decodeunicode.org/U+2237) | `∷` | `\Proportion` |  |
 | [`2239`](https://decodeunicode.org/U+2239) | `∹` | `\eqcolon` | EXCESS |
 | [`223A`](https://decodeunicode.org/U+223A) | `∺` | `\dotsminusdots` | GEOMETRIC PROPORTION |
@@ -1503,6 +1524,7 @@
 
 | Code | Char | Command | Character Name |
 | ---:|:---:| --- | --- |
+| [`002E`](https://decodeunicode.org/U+002E) | `.` | `\period` | FULL STOP |
 | [`00B5`](https://decodeunicode.org/U+00B5) | `µ` | `\Micro` | MICRO SIGN |
 | [`00F0`](https://decodeunicode.org/U+00F0) | `ð` | `\eth` |  |
 | [`0131`](https://decodeunicode.org/U+0131) | `ı` | `\imath` |  |
@@ -1661,6 +1683,57 @@
 | [`1D431`](https://decodeunicode.org/U+1D431) | `𝐱` | `\mathbf{x}` | MATHEMATICAL BOLD SMALL X |
 | [`1D432`](https://decodeunicode.org/U+1D432) | `𝐲` | `\mathbf{y}` | MATHEMATICAL BOLD SMALL Y |
 | [`1D433`](https://decodeunicode.org/U+1D433) | `𝐳` | `\mathbf{z}` | MATHEMATICAL BOLD SMALL Z |
+| [`1D434`](https://decodeunicode.org/U+1D434) | `𝐴` | `\mitA` | MATHEMATICAL ITALIC CAPITAL A |
+| [`1D435`](https://decodeunicode.org/U+1D435) | `𝐵` | `\mitB` | MATHEMATICAL ITALIC CAPITAL B |
+| [`1D436`](https://decodeunicode.org/U+1D436) | `𝐶` | `\mitC` | MATHEMATICAL ITALIC CAPITAL C |
+| [`1D437`](https://decodeunicode.org/U+1D437) | `𝐷` | `\mitD` | MATHEMATICAL ITALIC CAPITAL D |
+| [`1D438`](https://decodeunicode.org/U+1D438) | `𝐸` | `\mitE` | MATHEMATICAL ITALIC CAPITAL E |
+| [`1D439`](https://decodeunicode.org/U+1D439) | `𝐹` | `\mitF` | MATHEMATICAL ITALIC CAPITAL F |
+| [`1D43A`](https://decodeunicode.org/U+1D43A) | `𝐺` | `\mitG` | MATHEMATICAL ITALIC CAPITAL G |
+| [`1D43B`](https://decodeunicode.org/U+1D43B) | `𝐻` | `\mitH` | MATHEMATICAL ITALIC CAPITAL H |
+| [`1D43C`](https://decodeunicode.org/U+1D43C) | `𝐼` | `\mitI` | MATHEMATICAL ITALIC CAPITAL I |
+| [`1D43D`](https://decodeunicode.org/U+1D43D) | `𝐽` | `\mitJ` | MATHEMATICAL ITALIC CAPITAL J |
+| [`1D43E`](https://decodeunicode.org/U+1D43E) | `𝐾` | `\mitK` | MATHEMATICAL ITALIC CAPITAL K |
+| [`1D43F`](https://decodeunicode.org/U+1D43F) | `𝐿` | `\mitL` | MATHEMATICAL ITALIC CAPITAL L |
+| [`1D440`](https://decodeunicode.org/U+1D440) | `𝑀` | `\mitM` | MATHEMATICAL ITALIC CAPITAL M |
+| [`1D441`](https://decodeunicode.org/U+1D441) | `𝑁` | `\mitN` | MATHEMATICAL ITALIC CAPITAL N |
+| [`1D442`](https://decodeunicode.org/U+1D442) | `𝑂` | `\mitO` | MATHEMATICAL ITALIC CAPITAL O |
+| [`1D443`](https://decodeunicode.org/U+1D443) | `𝑃` | `\mitP` | MATHEMATICAL ITALIC CAPITAL P |
+| [`1D444`](https://decodeunicode.org/U+1D444) | `𝑄` | `\mitQ` | MATHEMATICAL ITALIC CAPITAL Q |
+| [`1D445`](https://decodeunicode.org/U+1D445) | `𝑅` | `\mitR` | MATHEMATICAL ITALIC CAPITAL R |
+| [`1D446`](https://decodeunicode.org/U+1D446) | `𝑆` | `\mitS` | MATHEMATICAL ITALIC CAPITAL S |
+| [`1D447`](https://decodeunicode.org/U+1D447) | `𝑇` | `\mitT` | MATHEMATICAL ITALIC CAPITAL T |
+| [`1D448`](https://decodeunicode.org/U+1D448) | `𝑈` | `\mitU` | MATHEMATICAL ITALIC CAPITAL U |
+| [`1D449`](https://decodeunicode.org/U+1D449) | `𝑉` | `\mitV` | MATHEMATICAL ITALIC CAPITAL V |
+| [`1D44A`](https://decodeunicode.org/U+1D44A) | `𝑊` | `\mitW` | MATHEMATICAL ITALIC CAPITAL W |
+| [`1D44B`](https://decodeunicode.org/U+1D44B) | `𝑋` | `\mitX` | MATHEMATICAL ITALIC CAPITAL X |
+| [`1D44C`](https://decodeunicode.org/U+1D44C) | `𝑌` | `\mitY` | MATHEMATICAL ITALIC CAPITAL Y |
+| [`1D44D`](https://decodeunicode.org/U+1D44D) | `𝑍` | `\mitZ` | MATHEMATICAL ITALIC CAPITAL Z |
+| [`1D44E`](https://decodeunicode.org/U+1D44E) | `𝑎` | `\mita` | MATHEMATICAL ITALIC SMALL A |
+| [`1D44F`](https://decodeunicode.org/U+1D44F) | `𝑏` | `\mitb` | MATHEMATICAL ITALIC SMALL B |
+| [`1D450`](https://decodeunicode.org/U+1D450) | `𝑐` | `\mitc` | MATHEMATICAL ITALIC SMALL C |
+| [`1D451`](https://decodeunicode.org/U+1D451) | `𝑑` | `\mitd` | MATHEMATICAL ITALIC SMALL D |
+| [`1D452`](https://decodeunicode.org/U+1D452) | `𝑒` | `\mite` | MATHEMATICAL ITALIC SMALL E |
+| [`1D453`](https://decodeunicode.org/U+1D453) | `𝑓` | `\mitf` | MATHEMATICAL ITALIC SMALL F |
+| [`1D454`](https://decodeunicode.org/U+1D454) | `𝑔` | `\mitg` | MATHEMATICAL ITALIC SMALL G |
+| [`1D456`](https://decodeunicode.org/U+1D456) | `𝑖` | `\miti` | MATHEMATICAL ITALIC SMALL I |
+| [`1D457`](https://decodeunicode.org/U+1D457) | `𝑗` | `\mitj` | MATHEMATICAL ITALIC SMALL J |
+| [`1D458`](https://decodeunicode.org/U+1D458) | `𝑘` | `\mitk` | MATHEMATICAL ITALIC SMALL K |
+| [`1D459`](https://decodeunicode.org/U+1D459) | `𝑙` | `\mitl` | MATHEMATICAL ITALIC SMALL L |
+| [`1D45A`](https://decodeunicode.org/U+1D45A) | `𝑚` | `\mitm` | MATHEMATICAL ITALIC SMALL M |
+| [`1D45B`](https://decodeunicode.org/U+1D45B) | `𝑛` | `\mitn` | MATHEMATICAL ITALIC SMALL N |
+| [`1D45C`](https://decodeunicode.org/U+1D45C) | `𝑜` | `\mito` | MATHEMATICAL ITALIC SMALL O |
+| [`1D45D`](https://decodeunicode.org/U+1D45D) | `𝑝` | `\mitp` | MATHEMATICAL ITALIC SMALL P |
+| [`1D45E`](https://decodeunicode.org/U+1D45E) | `𝑞` | `\mitq` | MATHEMATICAL ITALIC SMALL Q |
+| [`1D45F`](https://decodeunicode.org/U+1D45F) | `𝑟` | `\mitr` | MATHEMATICAL ITALIC SMALL R |
+| [`1D460`](https://decodeunicode.org/U+1D460) | `𝑠` | `\mits` | MATHEMATICAL ITALIC SMALL S |
+| [`1D461`](https://decodeunicode.org/U+1D461) | `𝑡` | `\mitt` | MATHEMATICAL ITALIC SMALL T |
+| [`1D462`](https://decodeunicode.org/U+1D462) | `𝑢` | `\mitu` | MATHEMATICAL ITALIC SMALL U |
+| [`1D463`](https://decodeunicode.org/U+1D463) | `𝑣` | `\mitv` | MATHEMATICAL ITALIC SMALL V |
+| [`1D464`](https://decodeunicode.org/U+1D464) | `𝑤` | `\mitw` | MATHEMATICAL ITALIC SMALL W |
+| [`1D465`](https://decodeunicode.org/U+1D465) | `𝑥` | `\mitx` | MATHEMATICAL ITALIC SMALL X |
+| [`1D466`](https://decodeunicode.org/U+1D466) | `𝑦` | `\mity` | MATHEMATICAL ITALIC SMALL Y |
+| [`1D467`](https://decodeunicode.org/U+1D467) | `𝑧` | `\mitz` | MATHEMATICAL ITALIC SMALL Z |
 | [`1D468`](https://decodeunicode.org/U+1D468) | `𝑨` | `\mathbfit{A}` | MATHEMATICAL BOLD ITALIC CAPITAL A |
 | [`1D469`](https://decodeunicode.org/U+1D469) | `𝑩` | `\mathbfit{B}` | MATHEMATICAL BOLD ITALIC CAPITAL B |
 | [`1D46A`](https://decodeunicode.org/U+1D46A) | `𝑪` | `\mathbfit{C}` | MATHEMATICAL BOLD ITALIC CAPITAL C |

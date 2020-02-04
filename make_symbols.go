@@ -335,10 +335,12 @@ func IncludeSymbol(symbol Symbol) bool {
 
 // SymbolCommand returns the preferred command for a symbol.
 func SymbolCommand(s Symbol) string {
-	if s.LaTeXCommand != "" {
-		return s.LaTeXCommand
+	for _, cmd := range []string{s.LaTeXCommand, s.UnicodeMathCommand} {
+		if len(cmd) >= 2 && !strings.ContainsRune(cmd, '[') {
+			return cmd
+		}
 	}
-	return s.UnicodeMathCommand
+	return ""
 }
 
 // aliassection is the section to use for alias macros.
@@ -392,13 +394,14 @@ var sections = []struct {
 	Name string
 }{
 	{aliassection, "Aliases"},
-	{"mathopen", "Opening Symbols"},  // 1
-	{"mathclose", "Closing Symbols"}, // 2
-	{"mathfence", "Fence Symbols"},   // 3
-	{"mathover", "Over Symbols"},     // 5
-	{"mathunder", "Under Symbols"},   // 6
-	{"mathaccent", "Accents"},        // 7
-	{"mathop", "Big Operators"},      // 9
+	{"mathopen", "Opening Symbols"},      // 1
+	{"mathclose", "Closing Symbols"},     // 2
+	{"mathfence", "Fence Symbols"},       // 3
+	{"mathpunct", "Punctuation Symbols"}, // 4
+	{"mathover", "Over Symbols"},         // 5
+	{"mathunder", "Under Symbols"},       // 6
+	{"mathaccent", "Accents"},            // 7
+	{"mathop", "Big Operators"},          // 9
 	{"mathradical", "Radicals"},
 	{"mathbin", "Binary relations"},       // 10
 	{"mathord", "Ordinary Symbols"},       // 11
