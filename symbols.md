@@ -1,5 +1,19 @@
 # Symbols Reference
 
+## Aliases
+
+| Char | Command | Character Name |
+| --- | --- | --- |
+| `±` | `+-` |  |
+| `←` | `<-` |  |
+| `→` | `->` |  |
+| `↦` | `|->` |  |
+| `∓` | `-+` | MINUS-OR-PLUS SIGN |
+| `∥` | `||` |  |
+| `≡` | `==` |  |
+| `⩽` | `<=` | LESS-THAN OR SLANTED EQUAL TO |
+| `⩾` | `>=` | GREATER-THAN OR SLANTED EQUAL TO |
+
 ## Opening Symbols
 
 | Char | Command | Character Name |

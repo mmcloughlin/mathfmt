@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -43,6 +44,18 @@ var generators = map[string]Generator{
 	"doc":   Documentation,
 }
 
+var aliasmap = map[string]string{
+	"+-":  `\pm`,
+	"-+":  `\mp`,
+	"==":  `\equiv`,
+	"<=":  `\leqslant`,
+	">=":  `\geqslant`,
+	"||":  `\parallel`,
+	"<-":  `\leftarrow`,
+	"->":  `\rightarrow`,
+	"|->": `\mapsto`,
+}
+
 func mainerr() error {
 	// Parse flags.
 	flag.Parse()
@@ -60,6 +73,16 @@ func mainerr() error {
 
 	// Process into macros.
 	macros := MacrosFromSymbols(symbols)
+
+	aliases, err := BuildAliases(macros, aliasmap)
+	if err != nil {
+		return err
+	}
+
+	macros = append(macros, aliases...)
+	sort.SliceStable(macros, func(i, j int) bool {
+		return macros[i].Char < macros[j].Char
+	})
 
 	// Generate output.
 	b, err := g(macros)
@@ -322,6 +345,32 @@ func SymbolCommand(s Symbol) string {
 	return s.UnicodeMathCommand
 }
 
+// aliassection is the section to use for alias macros.
+const aliassection = "alias"
+
+// BuildAliases builds a list of alias macros for the given from -> to mapping.
+func BuildAliases(macros []Macro, aliasmap map[string]string) ([]Macro, error) {
+	// Map from cmd to macro.
+	bycmd := map[string]Macro{}
+	for _, m := range macros {
+		bycmd[m.Command] = m
+	}
+
+	aliases := make([]Macro, 0, len(aliasmap))
+	for from, to := range aliasmap {
+		alias, ok := bycmd[to]
+		if !ok {
+			return nil, fmt.Errorf("unknown macro %q", to)
+		}
+
+		alias.Command = from
+		alias.Section = aliassection
+		aliases = append(aliases, alias)
+	}
+
+	return aliases, nil
+}
+
 // Generator generates output from a macros list.
 type Generator func([]Macro) ([]byte, error)
 
@@ -346,6 +395,7 @@ var sections = []struct {
 	ID   string
 	Name string
 }{
+	{aliassection, "Aliases"},
 	{"mathopen", "Opening Symbols"},  // 1
 	{"mathclose", "Closing Symbols"}, // 2
 	{"mathfence", "Fence Symbols"},   // 3
