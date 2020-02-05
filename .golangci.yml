@@ -6,6 +6,7 @@ linters:
     - gosec
     - prealloc
     - funlen
+    - lll
 
 issues:
   exclude-use-default: false
