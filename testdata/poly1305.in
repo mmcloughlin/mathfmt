@@ -133,7 +133,7 @@ func shiftRightBy2(a uint128) uint128 {
 // updateGeneric absorbs msg into the state.h accumulator. For each chunk m of
 // 128 bits of message, it computes
 //
-//     h_+ = (h + m) * r  mod  2^130 - 5
+//     h_{+} = (h + m) * r  mod  2^130 - 5
 //
 // If the msg length is not a multiple of TagSize, it assumes the last
 // incomplete chunk is the final one.
