@@ -8,6 +8,7 @@ import (
 	"go/token"
 	"regexp"
 	"strings"
+	"unicode"
 
 	"golang.org/x/tools/go/ast/astutil"
 )
@@ -88,7 +89,7 @@ func init() {
 	}
 
 	// Build regular expressions.
-	supregexp = regexp.MustCompile(`(\b[A-Za-z0-9]|\pS)\^(\d+|\{` + charclass(superclass) + `+\})`)
+	supregexp = regexp.MustCompile(`(\b[A-Za-z0-9]|\pS)\^(\d+|\{` + charclass(superclass) + `+\}|` + charclass(superclass) + `\s)`)
 	subregexp = regexp.MustCompile(`(\b[A-Za-z]|\pS)_(\d+\b|\{` + charclass(subclass) + `+\})`)
 }
 
@@ -115,7 +116,7 @@ func subsupreplacer(repl map[rune]rune) func(string) string {
 	return func(s string) string {
 		var runes []rune
 		for i, r := range s {
-			if i == 0 {
+			if i == 0 || unicode.IsSpace(r) {
 				runes = append(runes, r)
 			} else if repl[r] != None {
 				runes = append(runes, repl[r])
