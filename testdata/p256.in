@@ -20,7 +20,7 @@ var (
 	p256Params *CurveParams
 
 	// RInverse contains 1/R mod p - the inverse of the Montgomery constant
-	// (\mathfmt{2^257}).
+	// (2**257).
 	p256RInverse *big.Int
 )
 
@@ -86,19 +86,19 @@ func (p256Curve) ScalarMult(bigX, bigY *big.Int, scalar []byte) (x, y *big.Int) 
 // Field elements are represented as nine, unsigned 32-bit words.
 //
 // The value of an field element is:
-//   \mathfmt{x[0] + (x[1] * 2^29) + (x[2] * 2^57) + ... + (x[8] * 2^228)}
+//   x[0] + (x[1] * 2**29) + (x[2] * 2**57) + ... + (x[8] * 2**228)
 //
 // That is, each limb is alternately 29 or 28-bits wide in little-endian
 // order.
 //
-// This means that a field element hits \mathfmt{2^257}, rather than \mathfmt{2^256} as we would
-// like. A 28, 29, ... pattern would cause us to hit \mathfmt{2^256}, but that causes
+// This means that a field element hits 2**257, rather than 2**256 as we would
+// like. A 28, 29, ... pattern would cause us to hit 2**256, but that causes
 // problems when multiplying as terms end up one bit short of a limb which
 // would require much bit-shifting to correct.
 //
 // Finally, the values stored in a field element are in Montgomery form. So the
 // value |y| is stored as (y*R) mod p, where p is the P-256 prime and R is
-// \mathfmt{2^257}.
+// 2**257.
 
 const (
 	p256Limbs    = 9
@@ -125,23 +125,23 @@ var (
 //   Index  |  Index (binary) | Value
 //       0  |           0000  | 0G (all zeros, omitted)
 //       1  |           0001  | G
-//       2  |           0010  | \mathfmt{2^64G}
-//       3  |           0011  | \mathfmt{2^64G + G}
-//       4  |           0100  | \mathfmt{2^128G}
-//       5  |           0101  | \mathfmt{2^128G + G}
-//       6  |           0110  | \mathfmt{2^128G + 2^64G}
-//       7  |           0111  | \mathfmt{2^128G + 2^64G + G}
-//       8  |           1000  | \mathfmt{2^192G}
-//       9  |           1001  | \mathfmt{2^192G + G}
-//      10  |           1010  | \mathfmt{2^192G + 2^64G}
-//      11  |           1011  | \mathfmt{2^192G + 2^64G + G}
-//      12  |           1100  | \mathfmt{2^192G + 2^128G}
-//      13  |           1101  | \mathfmt{2^192G + 2^128G + G}
-//      14  |           1110  | \mathfmt{2^192G + 2^128G + 2^64G}
-//      15  |           1111  | \mathfmt{2^192G + 2^128G + 2^64G + G}
+//       2  |           0010  | 2**64G
+//       3  |           0011  | 2**64G + G
+//       4  |           0100  | 2**128G
+//       5  |           0101  | 2**128G + G
+//       6  |           0110  | 2**128G + 2**64G
+//       7  |           0111  | 2**128G + 2**64G + G
+//       8  |           1000  | 2**192G
+//       9  |           1001  | 2**192G + G
+//      10  |           1010  | 2**192G + 2**64G
+//      11  |           1011  | 2**192G + 2**64G + G
+//      12  |           1100  | 2**192G + 2**128G
+//      13  |           1101  | 2**192G + 2**128G + G
+//      14  |           1110  | 2**192G + 2**128G + 2**64G
+//      15  |           1111  | 2**192G + 2**128G + 2**64G + G
 //
-// The second table follows the same style, but the terms are \mathfmt{2^32G},
-// \mathfmt{2^96G, 2^160G, 2^224G}.
+// The second table follows the same style, but the terms are 2**32G,
+// 2**96G, 2**160G, 2**224G.
 //
 // This is ~2KB of data.
 var p256Precomputed = [p256Limbs * 2 * 15 * 2]uint32{
@@ -210,23 +210,23 @@ var p256Precomputed = [p256Limbs * 2 * 15 * 2]uint32{
 // Field element operations:
 
 // nonZeroToAllOnes returns:
-//   \mathfmt{0xffffffff for 0 < x <= 2^31}
-//   \mathfmt{0 for x == 0 or x > 2^31.}
+//   0xffffffff for 0 < x <= 2**31
+//   0 for x == 0 or x > 2**31.
 func nonZeroToAllOnes(x uint32) uint32 {
 	return ((x - 1) >> 31) - 1
 }
 
 // p256ReduceCarry adds a multiple of p in order to cancel |carry|,
-// which is a term at \mathfmt{2^257}.
+// which is a term at 2**257.
 //
-// On entry: \mathfmt{carry < 2^3, inout[0,2,...] < 2^29, inout[1,3,...] < 2^28}.
-// On exit: \mathfmt{inout[0,2,..] < 2^30, inout[1,3,...] < 2^29}.
+// On entry: carry < 2**3, inout[0,2,...] < 2**29, inout[1,3,...] < 2**28.
+// On exit: inout[0,2,..] < 2**30, inout[1,3,...] < 2**29.
 func p256ReduceCarry(inout *[p256Limbs]uint32, carry uint32) {
 	carry_mask := nonZeroToAllOnes(carry)
 
 	inout[0] += carry << 1
 	inout[3] += 0x10000000 & carry_mask
-	// \mathfmt{carry < 2^3 thus (carry << 11) < 2^14 and we added 2^28 in the}
+	// carry < 2**3 thus (carry << 11) < 2**14 and we added 2**28 in the
 	// previous line therefore this doesn't underflow.
 	inout[3] -= carry << 11
 	inout[4] += (0x20000000 - 1) & carry_mask
@@ -242,7 +242,7 @@ func p256ReduceCarry(inout *[p256Limbs]uint32, carry uint32) {
 // p256Sum sets out = in+in2.
 //
 // On entry, in[i]+in2[i] must not overflow a 32-bit word.
-// On exit: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}
+// On exit: out[0,2,...] < 2**30, out[1,3,...] < 2**29
 func p256Sum(out, in, in2 *[p256Limbs]uint32) {
 	carry := uint32(0)
 	for i := 0; ; i++ {
@@ -278,9 +278,9 @@ var p256Zero31 = [p256Limbs]uint32{two31m3, two30m2, two31m2, two30p13m2, two31m
 
 // p256Diff sets out = in-in2.
 //
-// On entry: \mathfmt{in[0,2,...] < 2^30, in[1,3,...] < 2^29 and}
-//           \mathfmt{in2[0,2,...] < 2^30, in2[1,3,...] < 2^29.}
-// On exit: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}.
+// On entry: in[0,2,...] < 2**30, in[1,3,...] < 2**29 and
+//           in2[0,2,...] < 2**30, in2[1,3,...] < 2**29.
+// On exit: out[0,2,...] < 2**30, out[1,3,...] < 2**29.
 func p256Diff(out, in, in2 *[p256Limbs]uint32) {
 	var carry uint32
 
@@ -310,12 +310,12 @@ func p256Diff(out, in, in2 *[p256Limbs]uint32) {
 // the same 29,28,... bit positions as an field element.
 //
 // The values in field elements are in Montgomery form: x*R mod p where R =
-// \mathfmt{2^257}. Since we just multiplied two Montgomery values together, the result
+// 2**257. Since we just multiplied two Montgomery values together, the result
 // is x*y*R*R mod p. We wish to divide by R in order for the result also to be
 // in Montgomery form.
 //
-// On entry: \mathfmt{tmp[i] < 2^64}
-// On exit: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}
+// On entry: tmp[i] < 2**64
+// On exit: out[0,2,...] < 2**30, out[1,3,...] < 2**29
 func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 	// The following table may be helpful when reading this code:
 	//
@@ -367,7 +367,7 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 
 	// Montgomery elimination of terms:
 	//
-	// Since R is \mathfmt{2^257}, we can divide by R with a bitwise shift if we can
+	// Since R is 2**257, we can divide by R with a bitwise shift if we can
 	// ensure that the right-most 257 bits are all zero. We can make that true
 	// by adding multiplies of p without affecting the value.
 	//
@@ -388,7 +388,7 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 		// The following table contains the amounts added to each word (as an
 		// offset from the value of i at the top of the loop). The amounts are
 		// accounted for from the first and second half of the loop separately
-		// and are written as, for example, 28 to mean a value \mathfmt{<2^28}.
+		// and are written as, for example, 28 to mean a value <2**28.
 		//
 		// Word:                   3   4   5   6   7   8   9   10
 		// Added in top half:     28  11      29  21  29  28
@@ -402,7 +402,7 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 		// the total value added will be the values added at 7, 5 and 3.
 		//
 		// The following table accumulates these values. The sums at the bottom
-		// are written as, for example, 29+28, to mean a value < \mathfmt{2^29+2^28}.
+		// are written as, for example, 29+28, to mean a value < 2**29+2**28.
 		//
 		// Word:                   3   4   5   6   7   8   9  10  11  12  13
 		//                        28  11  10  29  21  29  28  28  28  28  28
@@ -421,8 +421,8 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 		//                                                    11      11
 		//
 		// So the greatest amount is added to tmp2[10] and tmp2[12]. If
-		// \mathfmt{tmp2[10/12] has an initial value of <2^29, then the maximum value}
-		// \mathfmt{will be < 2^31 + 2^30 + 2^28 + 2^21 + 2^11, which is < 2^32,}
+		// tmp2[10/12] has an initial value of <2**29, then the maximum value
+		// will be < 2**31 + 2**30 + 2**28 + 2**21 + 2**11, which is < 2**32,
 		// as required.
 		tmp2[i+3] += (x << 10) & bottom28Bits
 		tmp2[i+4] += (x >> 18)
@@ -431,7 +431,7 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 		tmp2[i+7] += x >> 8
 
 		// At position 200, which is the starting bit position for word 7, we
-		// have a factor of 0xf000000 = \mathfmt{2^28 - 2^24}.
+		// have a factor of 0xf000000 = 2**28 - 2**24.
 		tmp2[i+7] += 0x10000000 & xMask
 		tmp2[i+8] += (x - 1) & xMask
 		tmp2[i+7] -= (x << 24) & bottom28Bits
@@ -458,7 +458,7 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 
 		// At position 199, which is the starting bit of the 8th word when
 		// dealing with a context starting on an odd word, we have a factor of
-		// \mathfmt{0x1e000000 = 2^29 - 2^25. Since we have not updated i, the 8th}
+		// 0x1e000000 = 2**29 - 2**25. Since we have not updated i, the 8th
 		// word from i+1 is i+8.
 		tmp2[i+8] += 0x20000000 & xMask
 		tmp2[i+9] += (x - 1) & xMask
@@ -470,12 +470,12 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 		tmp2[i+10] += (x - 1) & xMask
 	}
 
-	// We merge the right shift with a carry chain. The words above \mathfmt{2^257} have
+	// We merge the right shift with a carry chain. The words above 2**257 have
 	// widths of 28,29,... which we need to correct when copying them down.
 	carry = 0
 	for i := 0; i < 8; i++ {
 		// The maximum value of tmp2[i + 9] occurs on the first iteration and
-		// is \mathfmt{< 2^30+2^29+2^28. Adding 2^29 (from tmp2[i + 10])} is
+		// is < 2**30+2**29+2**28. Adding 2**29 (from tmp2[i + 10]) is
 		// therefore safe.
 		out[i] = tmp2[i+9]
 		out[i] += carry
@@ -500,8 +500,8 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 
 // p256Square sets out=in*in.
 //
-// On entry: \mathfmt{in[0,2,...] < 2^30, in[1,3,...] < 2^29}.
-// On exit: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}.
+// On entry: in[0,2,...] < 2**30, in[1,3,...] < 2**29.
+// On exit: out[0,2,...] < 2**30, out[1,3,...] < 2**29.
 func p256Square(out, in *[p256Limbs]uint32) {
 	var tmp [17]uint64
 
@@ -525,8 +525,8 @@ func p256Square(out, in *[p256Limbs]uint32) {
 		uint64(in[1])*(uint64(in[6])<<1) +
 		uint64(in[2])*(uint64(in[5])<<1) +
 		uint64(in[3])*(uint64(in[4])<<1)
-	// tmp[8] has the greatest value of \mathfmt{2^61 + 2^60 + 2^61 + 2^60 + 2^60},
-	// which is \mathfmt{< 2^64} as required.
+	// tmp[8] has the greatest value of 2**61 + 2**60 + 2**61 + 2**60 + 2**60,
+	// which is < 2**64 as required.
 	tmp[8] = uint64(in[0])*(uint64(in[8])<<1) +
 		uint64(in[1])*(uint64(in[7])<<2) +
 		uint64(in[2])*(uint64(in[6])<<1) +
@@ -558,9 +558,9 @@ func p256Square(out, in *[p256Limbs]uint32) {
 
 // p256Mul sets out=in*in2.
 //
-// On entry: \mathfmt{in[0,2,...] < 2^30, in[1,3,...] < 2^29} and
-//           \mathfmt{in2[0,2,...] < 2^30, in2[1,3,...] < 2^29}.
-// On exit: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}.
+// On entry: in[0,2,...] < 2**30, in[1,3,...] < 2**29 and
+//           in2[0,2,...] < 2**30, in2[1,3,...] < 2**29.
+// On exit: out[0,2,...] < 2**30, out[1,3,...] < 2**29.
 func p256Mul(out, in, in2 *[p256Limbs]uint32) {
 	var tmp [17]uint64
 
@@ -667,65 +667,65 @@ func p256Invert(out, in *[p256Limbs]uint32) {
 	// each e_I will hold |in|^{2^I - 1}
 	var e2, e4, e8, e16, e32, e64 [p256Limbs]uint32
 
-	p256Square(&ftmp, in)     // \mathfmt{2^1}
-	p256Mul(&ftmp, in, &ftmp) // \mathfmt{2^2 - 2^0}
+	p256Square(&ftmp, in)     // 2^1
+	p256Mul(&ftmp, in, &ftmp) // 2^2 - 2^0
 	p256Assign(&e2, &ftmp)
-	p256Square(&ftmp, &ftmp)   // \mathfmt{2^3 - 2^1}
-	p256Square(&ftmp, &ftmp)   // \mathfmt{2^4 - 2^2}
-	p256Mul(&ftmp, &ftmp, &e2) // \mathfmt{2^4 - 2^0}
+	p256Square(&ftmp, &ftmp)   // 2^3 - 2^1
+	p256Square(&ftmp, &ftmp)   // 2^4 - 2^2
+	p256Mul(&ftmp, &ftmp, &e2) // 2^4 - 2^0
 	p256Assign(&e4, &ftmp)
-	p256Square(&ftmp, &ftmp)   // \mathfmt{2^5 - 2^1}
-	p256Square(&ftmp, &ftmp)   // \mathfmt{2^6 - 2^2}
-	p256Square(&ftmp, &ftmp)   // \mathfmt{2^7 - 2^3}
-	p256Square(&ftmp, &ftmp)   // \mathfmt{2^8 - 2^4}
-	p256Mul(&ftmp, &ftmp, &e4) // \mathfmt{2^8 - 2^0}
+	p256Square(&ftmp, &ftmp)   // 2^5 - 2^1
+	p256Square(&ftmp, &ftmp)   // 2^6 - 2^2
+	p256Square(&ftmp, &ftmp)   // 2^7 - 2^3
+	p256Square(&ftmp, &ftmp)   // 2^8 - 2^4
+	p256Mul(&ftmp, &ftmp, &e4) // 2^8 - 2^0
 	p256Assign(&e8, &ftmp)
 	for i := 0; i < 8; i++ {
 		p256Square(&ftmp, &ftmp)
-	} // \mathfmt{2^16 - 2^8}
-	p256Mul(&ftmp, &ftmp, &e8) // \mathfmt{2^16 - 2^0}
+	} // 2^16 - 2^8
+	p256Mul(&ftmp, &ftmp, &e8) // 2^16 - 2^0
 	p256Assign(&e16, &ftmp)
 	for i := 0; i < 16; i++ {
 		p256Square(&ftmp, &ftmp)
-	} // \mathfmt{2^32 - 2^16}
-	p256Mul(&ftmp, &ftmp, &e16) // \mathfmt{2^32 - 2^0}
+	} // 2^32 - 2^16
+	p256Mul(&ftmp, &ftmp, &e16) // 2^32 - 2^0
 	p256Assign(&e32, &ftmp)
 	for i := 0; i < 32; i++ {
 		p256Square(&ftmp, &ftmp)
-	} // \mathfmt{2^64 - 2^32}
+	} // 2^64 - 2^32
 	p256Assign(&e64, &ftmp)
-	p256Mul(&ftmp, &ftmp, in) // \mathfmt{2^64 - 2^32 + 2^0}
+	p256Mul(&ftmp, &ftmp, in) // 2^64 - 2^32 + 2^0
 	for i := 0; i < 192; i++ {
 		p256Square(&ftmp, &ftmp)
-	} // \mathfmt{2^256 - 2^224 + 2^192}
+	} // 2^256 - 2^224 + 2^192
 
-	p256Mul(&ftmp2, &e64, &e32) // \mathfmt{2^64 - 2^0}
+	p256Mul(&ftmp2, &e64, &e32) // 2^64 - 2^0
 	for i := 0; i < 16; i++ {
 		p256Square(&ftmp2, &ftmp2)
-	} // \mathfmt{2^80 - 2^16}
-	p256Mul(&ftmp2, &ftmp2, &e16) // \mathfmt{2^80 - 2^0}
+	} // 2^80 - 2^16
+	p256Mul(&ftmp2, &ftmp2, &e16) // 2^80 - 2^0
 	for i := 0; i < 8; i++ {
 		p256Square(&ftmp2, &ftmp2)
-	} // \mathfmt{2^88 - 2^8}
-	p256Mul(&ftmp2, &ftmp2, &e8) // \mathfmt{2^88 - 2^0}
+	} // 2^88 - 2^8
+	p256Mul(&ftmp2, &ftmp2, &e8) // 2^88 - 2^0
 	for i := 0; i < 4; i++ {
 		p256Square(&ftmp2, &ftmp2)
-	} // \mathfmt{2^92 - 2^4}
-	p256Mul(&ftmp2, &ftmp2, &e4) // \mathfmt{2^92 - 2^0}
-	p256Square(&ftmp2, &ftmp2)   // \mathfmt{2^93 - 2^1}
-	p256Square(&ftmp2, &ftmp2)   // \mathfmt{2^94 - 2^2}
-	p256Mul(&ftmp2, &ftmp2, &e2) // \mathfmt{2^94 - 2^0}
-	p256Square(&ftmp2, &ftmp2)   // \mathfmt{2^95 - 2^1}
-	p256Square(&ftmp2, &ftmp2)   // \mathfmt{2^96 - 2^2}
-	p256Mul(&ftmp2, &ftmp2, in)  // \mathfmt{2^96 - 3}
+	} // 2^92 - 2^4
+	p256Mul(&ftmp2, &ftmp2, &e4) // 2^92 - 2^0
+	p256Square(&ftmp2, &ftmp2)   // 2^93 - 2^1
+	p256Square(&ftmp2, &ftmp2)   // 2^94 - 2^2
+	p256Mul(&ftmp2, &ftmp2, &e2) // 2^94 - 2^0
+	p256Square(&ftmp2, &ftmp2)   // 2^95 - 2^1
+	p256Square(&ftmp2, &ftmp2)   // 2^96 - 2^2
+	p256Mul(&ftmp2, &ftmp2, in)  // 2^96 - 3
 
-	p256Mul(out, &ftmp2, &ftmp) // \mathfmt{2^256 - 2^224 + 2^192 + 2^96 - 3}
+	p256Mul(out, &ftmp2, &ftmp) // 2^256 - 2^224 + 2^192 + 2^96 - 3
 }
 
 // p256Scalar3 sets out=3*out.
 //
-// On entry: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}.
-// On exit: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}.
+// On entry: out[0,2,...] < 2**30, out[1,3,...] < 2**29.
+// On exit: out[0,2,...] < 2**30, out[1,3,...] < 2**29.
 func p256Scalar3(out *[p256Limbs]uint32) {
 	var carry uint32
 
@@ -751,8 +751,8 @@ func p256Scalar3(out *[p256Limbs]uint32) {
 
 // p256Scalar4 sets out=4*out.
 //
-// On entry: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}.
-// On exit: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}.
+// On entry: out[0,2,...] < 2**30, out[1,3,...] < 2**29.
+// On exit: out[0,2,...] < 2**30, out[1,3,...] < 2**29.
 func p256Scalar4(out *[p256Limbs]uint32) {
 	var carry, nextCarry uint32
 
@@ -781,8 +781,8 @@ func p256Scalar4(out *[p256Limbs]uint32) {
 
 // p256Scalar8 sets out=8*out.
 //
-// On entry: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}.
-// On exit: \mathfmt{out[0,2,...] < 2^30, out[1,3,...] < 2^29}.
+// On entry: out[0,2,...] < 2**30, out[1,3,...] < 2**29.
+// On exit: out[0,2,...] < 2**30, out[1,3,...] < 2**29.
 func p256Scalar8(out *[p256Limbs]uint32) {
 	var carry, nextCarry uint32
 
