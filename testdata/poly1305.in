@@ -12,14 +12,14 @@ import "encoding/binary"
 // Poly1305 [RFC 7539] is a relatively simple algorithm: the authentication tag
 // for a 64 bytes message is approximately
 //
-//     \mathfmt{s + m[0:16] * r^4 + m[16:32] * r^3 + m[32:48] * r^2 + m[48:64] * r  mod  2^130 - 5}
+//     s + m[0:16] * r^4 + m[16:32] * r^3 + m[32:48] * r^2 + m[48:64] * r  mod  2^130 - 5
 //
 // for some secret r and s. It can be computed sequentially like
 //
 //     for len(msg) > 0:
 //         h += read(msg, 16)
 //         h *= r
-//         \mathfmt{h %= 2^130 - 5}
+//         h %= 2^130 - 5
 //     return h + s
 //
 // All the complexity is about doing performant constant-time math on numbers
@@ -37,9 +37,9 @@ func newMACGeneric(key *[32]byte) (h macGeneric) {
 }
 
 // macState holds numbers in saturated 64-bit little-endian limbs. That is,
-// the value of [x0, x1, x2] is \mathfmt{x[0] + x[1] * 2^64 + x[2] * 2^128}.
+// the value of [x0, x1, x2] is x[0] + x[1] * 2^64 + x[2] * 2^128.
 type macState struct {
-	// h is the main accumulator. It is to be interpreted modulo \mathfmt{2^130 - 5}, but
+	// h is the main accumulator. It is to be interpreted modulo 2^130 - 5, but
 	// can grow larger during and after rounds.
 	h [3]uint64
 	// r and s are the private key components.
@@ -133,7 +133,7 @@ func shiftRightBy2(a uint128) uint128 {
 // updateGeneric absorbs msg into the state.h accumulator. For each chunk m of
 // 128 bits of message, it computes
 //
-//     \mathfmt{h_+ = (h + m) * r  mod  2^130 - 5}
+//     h_+ = (h + m) * r  mod  2^130 - 5
 //
 // If the msg length is not a multiple of TagSize, it assumes the last
 // incomplete chunk is the final one.
@@ -145,12 +145,12 @@ func updateGeneric(state *macState, msg []byte) {
 		var c uint64
 
 		// For the first step, h + m, we use a chain of bits.Add64 intrinsics.
-		// The resulting value of h might exceed \mathfmt{2^130 - 5}, but will be partially
+		// The resulting value of h might exceed 2^130 - 5, but will be partially
 		// reduced at the end of the multiplication below.
 		//
 		// The spec requires us to set a bit just above the message size, not to
 		// hide leading zeroes. For full chunks, that's 1 << 128, so we can just
-		// add 1 to the most significant (\mathfmt{2^128}) limb, h2.
+		// add 1 to the most significant (2^128) limb, h2.
 		if len(msg) >= TagSize {
 			h0, c = bitsAdd64(h0, binary.LittleEndian.Uint64(msg[0:8]), 0)
 			h1, c = bitsAdd64(h1, binary.LittleEndian.Uint64(msg[8:16]), c)
@@ -174,18 +174,18 @@ func updateGeneric(state *macState, msg []byte) {
 		//
 		// We are multiplying a 3 limbs number, h, by a 2 limbs number, r.
 		//
-		//                        h2    h1    h0  x
+		//                        h2    h1    h0  \times
 		//                              r1    r0  =
 		//                       ----------------
-		//                      h2r0  h1r0  h0r0     <-- individual 128-bit products
+		//                      h2r0  h1r0  h0r0     <- individual 128-bit products
 		//            +   h2r1  h1r1  h0r1
 		//               ------------------------
-		//                 m3    m2    m1    m0      <-- result in 128-bit overlapping limbs
+		//                 m3    m2    m1    m0      <- result in 128-bit overlapping limbs
 		//               ------------------------
-		//         m3.hi m2.hi m1.hi m0.hi           <-- carry propagation
+		//         m3.hi m2.hi m1.hi m0.hi           <- carry propagation
 		//     +         m3.lo m2.lo m1.lo m0.lo
 		//        -------------------------------
-		//           t4    t3    t2    t1    t0      <-- final result in 64-bit limbs
+		//           t4    t3    t2    t1    t0      <- final result in 64-bit limbs
 		//
 		// The main difference from pen-and-paper multiplication is that we do
 		// carry propagation in a separate step, as if we wrote two digit sums
@@ -221,18 +221,18 @@ func updateGeneric(state *macState, msg []byte) {
 		t3, _ := bitsAdd64(m3.lo, m2.hi, c)
 
 		// Now we have the result as 4 64-bit limbs, and we need to reduce it
-		// modulo \mathfmt{2^130 - 5}. The special shape of this Crandall prime lets us do
+		// modulo 2^130 - 5. The special shape of this Crandall prime lets us do
 		// a cheap partial reduction according to the reduction identity
 		//
-		//     \mathfmt{c * 2^130 + n  =  c * 5 + n  mod  2^130 - 5}
+		//     c * 2^130 + n  =  c * 5 + n  mod  2^130 - 5
 		//
-		// because \mathfmt{2^130 = 5 mod 2^130 - 5}. Partial reduction since the result is
-		// likely to be larger than \mathfmt{2^130 - 5}, but still small enough to fit the
+		// because 2^130 = 5 mod 2^130 - 5. Partial reduction since the result is
+		// likely to be larger than 2^130 - 5, but still small enough to fit the
 		// assumptions we make about h in the rest of the code.
 		//
 		// See also https://speakerdeck.com/gtank/engineering-prime-numbers?slide=23
 
-		// We split the final result at the \mathfmt{2^130} mark into h and cc, the carry.
+		// We split the final result at the 2^130 mark into h and cc, the carry.
 		// Note that the carry bits are effectively shifted left by 2, in other
 		// words, cc = c * 4 for the c in the reduction identity.
 		h0, h1, h2 = t0, t1, t2&maskLow2Bits
@@ -252,7 +252,7 @@ func updateGeneric(state *macState, msg []byte) {
 
 		// h2 is at most 3 + 1 + 1 = 5, making the whole of h at most
 		//
-		//     \mathfmt{5 * 2^128 + (2^128 - 1) = 6 * 2^128 - 1}
+		//     5 * 2^128 + (2^128 - 1) = 6 * 2^128 - 1
 	}
 
 	state.h[0], state.h[1], state.h[2] = h0, h1, h2
@@ -266,7 +266,7 @@ const (
 // select64 returns x if v == 1 and y if v == 0, in constant time.
 func select64(v, x, y uint64) uint64 { return ^(v-1)&x | (v-1)&y }
 
-// [p0, p1, p2] is \mathfmt{2^130 - 5} in little endian order.
+// [p0, p1, p2] is 2^130 - 5 in little endian order.
 const (
 	p0 = 0xFFFFFFFFFFFFFFFB
 	p1 = 0xFFFFFFFFFFFFFFFF
@@ -275,14 +275,14 @@ const (
 
 // finalize completes the modular reduction of h and computes
 //
-//     \mathfmt{out = h + s  mod  2^128}
+//     out = h + s  mod  2^128
 //
 func finalize(out *[TagSize]byte, h *[3]uint64, s *[2]uint64) {
 	h0, h1, h2 := h[0], h[1], h[2]
 
 	// After the partial reduction in updateGeneric, h might be more than
-	// \mathfmt{2^130 - 5}, but will be less than \mathfmt{2 * (2^130 - 5)}. To complete the reduction
-	// in constant time, we compute \mathfmt{t = h - (2^130 - 5)}, and select h as the
+	// 2^130 - 5, but will be less than 2 * (2^130 - 5). To complete the reduction
+	// in constant time, we compute t = h - (2^130 - 5), and select h as the
 	// result if the subtraction underflows, and t otherwise.
 
 	hMinusP0, b := bitsSub64(h0, p0, 0)
@@ -295,7 +295,7 @@ func finalize(out *[TagSize]byte, h *[3]uint64, s *[2]uint64) {
 
 	// Finally, we compute the last Poly1305 step
 	//
-	//     \mathfmt{tag = h + s  mod  2^128}
+	//     tag = h + s  mod  2^128
 	//
 	// by just doing a wide addition with the 128 low bits of h and discarding
 	// the overflow.
