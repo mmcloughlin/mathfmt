@@ -47,12 +47,12 @@ var generators = map[string]Generator{
 var aliasmap = map[string]string{
 	"+-":  `\pm`,
 	"-+":  `\mp`,
-	"==":  `\equiv`,
+	"===": `\equiv`,
 	"<=":  `\leqslant`,
 	">=":  `\geqslant`,
 	"||":  `\parallel`,
-	"<-":  `\leftarrow`,
-	"->":  `\rightarrow`,
+	"<--": `\leftarrow`,
+	"-->": `\rightarrow`,
 	"|->": `\mapsto`,
 }
 

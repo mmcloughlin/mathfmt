@@ -20,12 +20,12 @@
 | Code | Char | Command | Character Name |
 | ---:|:---:| --- | --- |
 | [`00B1`](https://decodeunicode.org/U+00B1) | `±` | `+-` |  |
-| [`2190`](https://decodeunicode.org/U+2190) | `←` | `<-` |  |
-| [`2192`](https://decodeunicode.org/U+2192) | `→` | `->` |  |
+| [`2190`](https://decodeunicode.org/U+2190) | `←` | `<--` |  |
+| [`2192`](https://decodeunicode.org/U+2192) | `→` | `-->` |  |
 | [`21A6`](https://decodeunicode.org/U+21A6) | `↦` | `\|->` |  |
 | [`2213`](https://decodeunicode.org/U+2213) | `∓` | `-+` | MINUS-OR-PLUS SIGN |
 | [`2225`](https://decodeunicode.org/U+2225) | `∥` | `\|\|` |  |
-| [`2261`](https://decodeunicode.org/U+2261) | `≡` | `==` |  |
+| [`2261`](https://decodeunicode.org/U+2261) | `≡` | `===` |  |
 | [`2A7D`](https://decodeunicode.org/U+2A7D) | `⩽` | `<=` | LESS-THAN OR SLANTED EQUAL TO |
 | [`2A7E`](https://decodeunicode.org/U+2A7E) | `⩾` | `>=` | GREATER-THAN OR SLANTED EQUAL TO |
 

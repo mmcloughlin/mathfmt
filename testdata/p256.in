@@ -211,7 +211,7 @@ var p256Precomputed = [p256Limbs * 2 * 15 * 2]uint32{
 
 // nonZeroToAllOnes returns:
 //   0xffffffff for 0 < x <= 2^31
-//   0 for x == 0 or x > 2^31.
+//   0 for x === 0 or x > 2^31.
 func nonZeroToAllOnes(x uint32) uint32 {
 	return ((x - 1) >> 31) - 1
 }
@@ -372,7 +372,7 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 	// by adding multiplies of p without affecting the value.
 	//
 	// So we eliminate limbs from right to left. Since the bottom 29 bits of p
-	// are all ones, then by adding tmp2[0]*p to tmp2 we'll make tmp2[0] == 0.
+	// are all ones, then by adding tmp2[0]*p to tmp2 we'll make tmp2[0] === 0.
 	// We can do that for 8 further limbs and then right shift to eliminate the
 	// extra factor of R.
 	for i := 0; ; i += 2 {
