@@ -22,8 +22,8 @@ func Format(src []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	// Apply transform.
-	transformed := CommentTransform(f, formula)
+	// Process every comment as a formula.
+	transformed := commentreplace(f, formula)
 
 	// Format.
 	buf := bytes.NewBuffer(nil)
@@ -33,19 +33,19 @@ func Format(src []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// CommentTransform applies transform to the text of every comment under the root AST.
-func CommentTransform(root ast.Node, transform func(string) string) ast.Node {
+// commentreplace applies repl function to the text of every comment under the root AST.
+func commentreplace(root ast.Node, repl func(string) string) ast.Node {
 	return astutil.Apply(root, func(c *astutil.Cursor) bool {
 		switch n := c.Node().(type) {
 		case *ast.Comment:
 			c.Replace(&ast.Comment{
 				Slash: n.Slash,
-				Text:  transform(n.Text),
+				Text:  repl(n.Text),
 			})
 		case *ast.File:
 			for _, g := range n.Comments {
 				for _, comment := range g.List {
-					comment.Text = transform(comment.Text)
+					comment.Text = repl(comment.Text)
 				}
 			}
 		}
@@ -112,6 +112,8 @@ func formula(s string) string {
 	return s
 }
 
+// subsupreplacer builds a replacement function that applies the repl rune map
+// to a matched super/subscript.
 func subsupreplacer(repl map[rune]rune) func(string) string {
 	return func(s string) string {
 		var runes []rune
