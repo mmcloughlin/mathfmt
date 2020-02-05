@@ -3,60 +3,65 @@ package main
 import (
 	"bytes"
 	"errors"
+	"go/ast"
+	"go/format"
+	"go/parser"
+	"go/token"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"golang.org/x/tools/go/ast/astutil"
 )
 
-// macroname is the name of the macro that applies math formatting.
-const macroname = "\\mathfmt"
-
-// Format processes the source code in b.
-func Format(b []byte) ([]byte, error) {
-	var buf bytes.Buffer
-	s := string(b)
-	for len(s) > 0 {
-		// Look for the next macro.
-		i := strings.Index(s, macroname)
-
-		// Exit if not found.
-		if i < 0 {
-			buf.WriteString(s)
-			break
-		}
-
-		// Write out up to the macro.
-		buf.WriteString(s[:i])
-		s = s[i:]
-
-		// Process the macro.
-		rest, err := macro(&buf, s[len(macroname):])
-		if err != nil {
-			return nil, err
-		}
-		s = rest
+// Format processes the source code.
+func Format(src []byte) ([]byte, error) {
+	// Parse.
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, "", src, parser.ParseComments)
+	if err != nil {
+		return nil, err
 	}
 
+	// Apply transform.
+	transformed := CommentTransform(f, func(text string) string {
+		newtext, errf := formula(text)
+		if errf != nil {
+			err = errf
+			return text
+		}
+		return newtext
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Format.
+	buf := bytes.NewBuffer(nil)
+	if err := format.Node(buf, fset, transformed); err != nil {
+		return nil, err
+	}
 	return buf.Bytes(), nil
 }
 
-// macro processes a macro starting at s. Note s begins at the character directly after the macro name.
-func macro(w *bytes.Buffer, s string) (string, error) {
-	if len(s) == 0 {
-		return "", errors.New("empty macro")
-	}
-
-	arg, rest, err := parsebraces(s)
-	if err != nil {
-		return "", err
-	}
-
-	n := len(arg)
-	if err := formula(w, arg[1:n-1]); err != nil {
-		return "", err
-	}
-
-	return rest, nil
+// CommentTransform applies transform to the text of every comment under the root AST.
+func CommentTransform(root ast.Node, transform func(string) string) ast.Node {
+	return astutil.Apply(root, func(c *astutil.Cursor) bool {
+		switch n := c.Node().(type) {
+		case *ast.Comment:
+			c.Replace(&ast.Comment{
+				Slash: n.Slash,
+				Text:  transform(n.Text),
+			})
+		case *ast.File:
+			for _, g := range n.Comments {
+				for _, comment := range g.List {
+					comment.Text = transform(comment.Text)
+				}
+			}
+		}
+		return true
+	}, nil)
 }
 
 // Fixed data structures required for formula processing.
@@ -86,15 +91,16 @@ func init() {
 }
 
 // formula processes a formula in s, writing the result to w.
-func formula(w *bytes.Buffer, s string) error {
+func formula(s string) (string, error) {
 	if len(s) == 0 {
-		return nil
+		return "", nil
 	}
 
 	// Replace symbols.
 	s = replacer.Replace(s)
 
 	// Replace super/subscripts.
+	buf := bytes.NewBuffer(nil)
 	last := None
 	for len(s) > 0 {
 		r, size := utf8.DecodeRuneInString(s)
@@ -107,7 +113,7 @@ func formula(w *bytes.Buffer, s string) error {
 		case '_':
 			repl = sub
 		default:
-			w.WriteRune(r)
+			buf.WriteRune(r)
 			last = r
 			s = s[size:]
 			continue
@@ -116,19 +122,19 @@ func formula(w *bytes.Buffer, s string) error {
 		// Perform replacement.
 		if unicode.IsPrint(last) && !unicode.IsSpace(last) {
 			var err error
-			s, err = supsub(w, s, repl)
+			s, err = supsub(buf, s, repl)
 			if err != nil {
-				return err
+				return "", err
 			}
 		} else {
-			w.WriteRune(r)
+			buf.WriteRune(r)
 			s = s[size:]
 		}
 
 		last = None
 	}
 
-	return nil
+	return buf.String(), nil
 }
 
 // supsub processes a super/subscript starting at s, writing the result to w.

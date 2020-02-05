@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"testing"
 )
 
@@ -58,12 +57,10 @@ func TestFormula(t *testing.T) {
 	for _, c := range cases {
 		c := c // scopelint
 		t.Run(c.Name, func(t *testing.T) {
-			buf := bytes.NewBuffer(nil)
-			err := formula(buf, c.Input)
+			got, err := formula(c.Input)
 			if err != nil {
 				t.Fatal(err)
 			}
-			got := buf.String()
 			if got != c.Expect {
 				t.Logf("input  = %q", c.Input)
 				t.Logf("got    = %q", got)

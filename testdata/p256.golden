@@ -372,7 +372,7 @@ func p256ReduceDegree(out *[p256Limbs]uint32, tmp [17]uint64) {
 	// by adding multiplies of p without affecting the value.
 	//
 	// So we eliminate limbs from right to left. Since the bottom 29 bits of p
-	// are all ones, then by adding tmp2[0]*p to tmp2 we'll make tmp2[0] == 0.
+	// are all ones, then by adding tmp2[0]*p to tmp2 we'll make tmp2[0] ≡ 0.
 	// We can do that for 8 further limbs and then right shift to eliminate the
 	// extra factor of R.
 	for i := 0; ; i += 2 {
@@ -655,16 +655,16 @@ func p256Assign(out, in *[p256Limbs]uint32) {
 	*out = *in
 }
 
-// p256Invert calculates |out| = |in|^{-1}
+// p256Invert calculates |out| = |in|⁻¹
 //
 // Based on Fermat's Little Theorem:
-//   a^p = a (mod p)
-//   a^{p-1} = 1 (mod p)
-//   a^{p-2} = a^{-1} (mod p)
+//   aᵖ = a (mod p)
+//   aᵖ⁻¹ = 1 (mod p)
+//   aᵖ⁻² = a⁻¹ (mod p)
 func p256Invert(out, in *[p256Limbs]uint32) {
 	var ftmp, ftmp2 [p256Limbs]uint32
 
-	// each e_I will hold |in|^{2^I - 1}
+	// each e_I will hold |in|^{2ᴵ - 1}
 	var e2, e4, e8, e16, e32, e64 [p256Limbs]uint32
 
 	p256Square(&ftmp, in)     // 2¹
@@ -939,7 +939,7 @@ func p256CopyConditional(out, in *[p256Limbs]uint32, mask uint32) {
 	}
 }
 
-// p256SelectAffinePoint sets {out_x,out_y} to the index'th entry of table.
+// p256SelectAffinePoint sets {xOut,yOut} to the index'th entry of table.
 // On entry: index < 16, table[0] must be zero.
 func p256SelectAffinePoint(xOut, yOut *[p256Limbs]uint32, table []uint32, index uint32) {
 	for i := range xOut {
@@ -966,7 +966,7 @@ func p256SelectAffinePoint(xOut, yOut *[p256Limbs]uint32, table []uint32, index 
 	}
 }
 
-// p256SelectJacobianPoint sets {out_x,out_y,out_z} to the index'th entry of
+// p256SelectJacobianPoint sets {xOut,yOut,zOut} to the index'th entry of
 // table.
 // On entry: index < 16, table[0] must be zero.
 func p256SelectJacobianPoint(xOut, yOut, zOut *[p256Limbs]uint32, table *[16][3][p256Limbs]uint32, index uint32) {

@@ -174,18 +174,18 @@ func updateGeneric(state *macState, msg []byte) {
 		//
 		// We are multiplying a 3 limbs number, h, by a 2 limbs number, r.
 		//
-		//                        h2    h1    h0  x
+		//                        h2    h1    h0  ×
 		//                              r1    r0  =
 		//                       ----------------
-		//                      h2r0  h1r0  h0r0     <-- individual 128-bit products
+		//                      h2r0  h1r0  h0r0     ← individual 128-bit products
 		//            +   h2r1  h1r1  h0r1
 		//               ------------------------
-		//                 m3    m2    m1    m0      <-- result in 128-bit overlapping limbs
+		//                 m3    m2    m1    m0      ← result in 128-bit overlapping limbs
 		//               ------------------------
-		//         m3.hi m2.hi m1.hi m0.hi           <-- carry propagation
+		//         m3.hi m2.hi m1.hi m0.hi           ← carry propagation
 		//     +         m3.lo m2.lo m1.lo m0.lo
 		//        -------------------------------
-		//           t4    t3    t2    t1    t0      <-- final result in 64-bit limbs
+		//           t4    t3    t2    t1    t0      ← final result in 64-bit limbs
 		//
 		// The main difference from pen-and-paper multiplication is that we do
 		// carry propagation in a separate step, as if we wrote two digit sums
@@ -263,7 +263,7 @@ const (
 	maskNotLow2Bits uint64 = ^maskLow2Bits
 )
 
-// select64 returns x if v == 1 and y if v == 0, in constant time.
+// select64 returns x if v ≡ 1 and y if v ≡ 0, in constant time.
 func select64(v, x, y uint64) uint64 { return ^(v-1)&x | (v-1)&y }
 
 // [p0, p1, p2] is 2¹³⁰ - 5 in little endian order.
