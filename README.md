@@ -83,20 +83,27 @@ combination of string replacement and regular expressions that appears to
 work most of time. However you may run into some [thorny edge
 cases](https://github.com/mmcloughlin/mathfmt/issues/9).
 
-**Source.** `mathfmt` only works on Go source code. _Every_ comment in the
+### Source
+
+`mathfmt` only works on Go source code. _Every_ comment in the
 file is processed, both single- and multi-line.
 
-**Symbols.** `mathfmt` recognizes a [huge symbol table](symbols.md) that is
+### Symbols
+
+`mathfmt` recognizes a [huge symbol table](symbols.md) that is
 almost entirely borrowed from LaTeX packages. Every symbol macro in comment
 text will be replaced with its corresponding Unicode character. In addition
 to LaTeX symbol macros, `mathfmt` supports a [limited set of
 "aliases"](symbols.md#aliases) for character combinations commonly used to
 represent mathematical symbols.
 
-**Super/subscripts.** Like LaTeX, superscripts use the `^` character and
-subscripts use `_`. If the super/subscript consists entirely of digits, then
-no braces are required: for example `2^128` or `x_13`. Otherwise braces must
-be used to surround the super/subscript, for example `2^{i}` or `x_{i+j}`.
+### Super/subscripts
+
+Like LaTeX, superscripts use the `^` character and subscripts use `_`. If the
+super/subscript consists entirely of digits, then no braces are required: for
+example `2^128` or `x_13`. Otherwise braces must be used to surround the
+super/subscript, for example `2^{i}` or `x_{i+j}`.
+
 Note that Unicode support for super/subscripts is limited, and in particular
 does not support the full alphabet. Therefore, if there is not a
 corresponding super/subscript character available for any character in braces
