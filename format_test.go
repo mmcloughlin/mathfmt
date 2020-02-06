@@ -63,6 +63,11 @@ func TestFormula(t *testing.T) {
 			Input:  "p256Invert calculates |out| = |in|^{-1}",
 			Expect: "p256Invert calculates |out| = |in|⁻¹",
 		},
+		{
+			Name:   "variance",
+			Input:  `\sigma^2 = \sum (x_{i} - \mu)^2 / N`,
+			Expect: `σ² = ∑ (xᵢ - μ)² / N`,
+		},
 	}
 	for _, c := range cases {
 		c := c // scopelint

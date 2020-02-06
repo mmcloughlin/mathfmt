@@ -89,7 +89,7 @@ func init() {
 	}
 
 	// Build regular expressions.
-	supregexp = regexp.MustCompile(`(\b[A-Za-z0-9]|\pS)\^(\d+|\{` + charclass(superclass) + `+\}|` + charclass(superclass) + `\s)`)
+	supregexp = regexp.MustCompile(`(\b[A-Za-z0-9]|[)\pL\pS^A-Za-z0-9])\^(\d+|\{` + charclass(superclass) + `+\}|` + charclass(superclass) + `\s)`)
 	subregexp = regexp.MustCompile(`(\b[A-Za-z]|\pS)_(\d+\b|\{` + charclass(subclass) + `+\})`)
 }
 

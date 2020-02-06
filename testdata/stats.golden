@@ -1,0 +1,34 @@
+package stats
+
+// Mean computes the average of the population xᵢ, that is:
+//
+//		∑ xᵢ / N
+//
+// where N ≡ len(X) is the size of the population.
+func Mean(X []float64) float64 {
+	s := 0.0
+	for _, x := range X {
+		s += x
+	}
+	return s / float64(len(X))
+}
+
+// Variance computes the population variance of the population X_i of size N.
+// Specifically, it computes σ² where
+//
+//		σ² = ∑ (xᵢ - μ)² / N
+//
+// See also: https://en.wikipedia.org/wiki/Variance.
+func Variance(X []float64) float64 {
+	// Compute the average μ.
+	mu := Mean(X)
+
+	// Compute the sum ∑ (xᵢ - μ)².
+	ss := 0.0
+	for _, x := range X {
+		ss += (x - mu) * (x - mu) // (xᵢ - μ)²
+	}
+
+	// Final divide by N to produce σ².
+	return ss / float64(len(X))
+}
