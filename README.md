@@ -8,7 +8,7 @@ Document mathematical Go code beautifully with Unicode symbols.
 
 Inspired by [Filippo Valsorda](https://filippo.io/)'s [literate Go
 implementation of
-Poly1305](https://blog.filippo.io/a-literate-go-implementation-of-poly1305/).
+Poly1305](https://blog.filippo.io/a-literate-go-implementation-of-poly1305/), which can be [reproduced using `mathfmt`](testdata/poly1305.in).
 
 ## Usage
 
