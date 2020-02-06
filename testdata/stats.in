@@ -13,7 +13,7 @@ func Mean(X []float64) float64 {
 	return s / float64(len(X))
 }
 
-// Variance computes the population variance of the population X_i of size N.
+// Variance computes the population variance of the population x_{i} of size N.
 // Specifically, it computes \sigma^2 where
 //
 //		\sigma^2 = \sum (x_{i} - \mu)^2 / N
