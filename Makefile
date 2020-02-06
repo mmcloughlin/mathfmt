@@ -1,3 +1,12 @@
+.PHONY: lint
+lint:
+	golangci-lint run
+	golangci-lint run make_symbols.go
+
+.PHONY: generate
+generate: symbols
+	embedmd -w README.md
+
 .PHONY: symbols
 symbols: zsymbols.go symbols.md
 
@@ -14,11 +23,7 @@ unimathsymbols.txt:
 clean:
 	$(RM) unimathsymbols.txt
 
-.PHONY: lint
-lint:
-	golangci-lint run
-	golangci-lint run make_symbols.go
-
 .PHONY: bootstrap
 bootstrap:
+	GO111MODULE="off" go get -u github.com/campoy/embedmd
 	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b ${GOPATH}/bin v1.19.1
