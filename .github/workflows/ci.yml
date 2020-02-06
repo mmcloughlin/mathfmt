@@ -39,14 +39,8 @@ jobs:
       run: make bootstrap
     - name: Lint
       run: make lint
-
-  symbols:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v1
-    - name: Generate Symbols
-      run: make symbols clean
+    - name: Generate
+      run: make generate clean
     - name: Git Status
       run: |
         git diff

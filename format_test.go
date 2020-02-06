@@ -68,6 +68,11 @@ func TestFormula(t *testing.T) {
 			Input:  `\sigma^2 = \sum (x_{i} - \mu)^2 / N`,
 			Expect: `σ² = ∑ (xᵢ - μ)² / N`,
 		},
+		{
+			Name:   "zeta_function",
+			Input:  `\zeta(s) = \sum 1/n^{s}`,
+			Expect: `ζ(s) = ∑ 1/nˢ`,
+		},
 	}
 	for _, c := range cases {
 		c := c // scopelint
