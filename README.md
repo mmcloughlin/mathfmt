@@ -1,6 +1,6 @@
 # mathfmt
 
-Document mathematical Go code beautifully with Unicode symbols.
+Document mathematical Go code beautifully.
 
 * Write mathematical formulae in a [LaTeX](https://en.wikipedia.org/wiki/LaTeX)-ish syntax
 * Super/subscripts formatted with Unicode characters: `2^32` becomes `2³²` and `x_{i+1}` becomes `xᵢ₊₁`
