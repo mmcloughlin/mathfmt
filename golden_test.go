@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"io/ioutil"
 	"path/filepath"
@@ -70,7 +69,7 @@ func TestFormatGolden(t *testing.T) {
 			}
 
 			// Compare.
-			AssertOutputEquals(t, expect, got)
+			AssertLinesEqual(t, expect, got)
 		})
 	}
 }
@@ -99,29 +98,6 @@ func TestInputsASCII(t *testing.T) {
 	}
 }
 
-func AssertOutputEquals(t *testing.T, expect, got []byte) {
-	t.Helper()
-
-	if bytes.Equal(expect, got) {
-		return
-	}
-	t.Fail()
-
-	// Break into lines.
-	expectlines := strings.Split(string(expect), "\n")
-	gotlines := strings.Split(string(got), "\n")
-
-	if len(expectlines) != len(gotlines) {
-		t.Fatalf("line number mismatch: got %v expect %v", len(gotlines), len(expectlines))
-	}
-
-	for i := range expectlines {
-		if expectlines[i] != gotlines[i] {
-			t.Errorf("line %d:\n\tgot    = %q\n\texpect = %q", i+1, gotlines[i], expectlines[i])
-		}
-	}
-}
-
 func BenchmarkFormatGolden(b *testing.B) {
 	for _, c := range LoadTestCases(b) {
 		c := c // scopelint
@@ -138,4 +114,26 @@ func BenchmarkFormatGolden(b *testing.B) {
 			}
 		})
 	}
+}
+
+func AssertLinesEqual(t *testing.T, expect, got []byte) {
+	t.Helper()
+
+	// Break into lines.
+	expectlines := Lines(string(expect))
+	gotlines := Lines(string(got))
+
+	if len(expectlines) != len(gotlines) {
+		t.Fatalf("line number mismatch: got %v expect %v", len(gotlines), len(expectlines))
+	}
+
+	for i := range expectlines {
+		if expectlines[i] != gotlines[i] {
+			t.Errorf("line %d:\n\tgot    = %q\n\texpect = %q", i+1, gotlines[i], expectlines[i])
+		}
+	}
+}
+
+func Lines(s string) []string {
+	return strings.Split(strings.ReplaceAll(s, "\r\n", "\n"), "\n")
 }
