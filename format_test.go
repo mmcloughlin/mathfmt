@@ -73,6 +73,16 @@ func TestFormula(t *testing.T) {
 			Input:  `\zeta(s) = \sum 1/n^{s}`,
 			Expect: `ζ(s) = ∑ 1/nˢ`,
 		},
+		{
+			Name:   "issue_14_eta_sub_2",
+			Input:  `\eta_2`,
+			Expect: "η₂",
+		},
+		{
+			Name:   "issue_14_eta_sup_2",
+			Input:  `\eta^2`,
+			Expect: "η²",
+		},
 	}
 	for _, c := range cases {
 		c := c // scopelint

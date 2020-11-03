@@ -90,7 +90,7 @@ func init() {
 
 	// Build regular expressions.
 	supregexp = regexp.MustCompile(`(\b[A-Za-z0-9]|[)\pL\pS^A-Za-z0-9])\^(\d+|\{` + charclass(superclass) + `+\}|` + charclass(superclass) + `\s)`)
-	subregexp = regexp.MustCompile(`(\b[A-Za-z]|\pS)_(\d+\b|\{` + charclass(subclass) + `+\})`)
+	subregexp = regexp.MustCompile(`(\b[A-Za-z]|\pS|\p{Greek})_(\d+\b|\{` + charclass(subclass) + `+\})`)
 }
 
 // charclass builds a regular expression character class from a list of runes.
