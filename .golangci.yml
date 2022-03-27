@@ -1,8 +1,10 @@
 linters:
   enable-all: true
   disable:
+    - exhaustivestruct
     - gochecknoglobals
     - gochecknoinits
+    - goerr113
     - golint
     - gomnd
     - gosec
@@ -18,6 +20,10 @@ linters:
     - varnamelen
     - wrapcheck
     - wsl
+
+linters-settings:
+  cyclop:
+    max-complexity: 12
 
 issues:
   exclude-use-default: false
