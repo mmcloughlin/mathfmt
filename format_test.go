@@ -133,8 +133,7 @@ func TestFormulaNoChange(t *testing.T) {
 
 func AssertFormulaOutput(t *testing.T, input, expect string) {
 	t.Helper()
-	got := formula(input)
-	if got != expect {
+	if got := formula(input); got != expect {
 		t.Logf("input  = %q", input)
 		t.Logf("got    = %q", got)
 		t.Logf("expect = %q", expect)

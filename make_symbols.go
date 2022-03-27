@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 package main
@@ -92,7 +93,7 @@ func mainerr() error {
 
 	// Write.
 	if *output != "" {
-		return ioutil.WriteFile(*output, b, 0666)
+		return ioutil.WriteFile(*output, b, 0o666)
 	}
 	_, err = os.Stdout.Write(b)
 	return err

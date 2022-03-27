@@ -1,12 +1,29 @@
 linters:
   enable-all: true
   disable:
+    - exhaustivestruct
     - gochecknoglobals
     - gochecknoinits
+    - goerr113
+    - golint
+    - gomnd
     - gosec
-    - prealloc
     - funlen
+    - interfacer
     - lll
+    - maligned
+    - nlreturn
+    - paralleltest
+    - prealloc
+    - scopelint
+    - testpackage
+    - varnamelen
+    - wrapcheck
+    - wsl
+
+linters-settings:
+  cyclop:
+    max-complexity: 12
 
 issues:
   exclude-use-default: false
