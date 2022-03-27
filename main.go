@@ -32,7 +32,7 @@ func process(filename string) {
 	}
 
 	if *write {
-		err = ioutil.WriteFile(filename, b, 0644)
+		err = ioutil.WriteFile(filename, b, 0o644)
 	} else {
 		_, err = os.Stdout.Write(b)
 	}

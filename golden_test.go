@@ -57,7 +57,7 @@ func TestFormatGolden(t *testing.T) {
 
 			// Update golden file if requested.
 			if *update {
-				if err := ioutil.WriteFile(c.Golden, got, 0666); err != nil {
+				if err := ioutil.WriteFile(c.Golden, got, 0o666); err != nil {
 					t.Fatal(err)
 				}
 			}
