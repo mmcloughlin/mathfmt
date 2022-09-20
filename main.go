@@ -15,8 +15,29 @@ func main() {
 
 	flag.Parse()
 
-	for _, filename := range flag.Args() {
-		process(filename)
+	for _, path := range flag.Args() {
+		processPath(path)
+	}
+}
+
+func processPath(path string) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if fileInfo.IsDir() {
+		entries, err := os.ReadDir(path)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, entry := range entries {
+			processPath(entry.Name())
+		}
+
+	} else {
+		process(path)
 	}
 }
 
