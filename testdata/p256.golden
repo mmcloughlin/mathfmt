@@ -123,23 +123,23 @@ var (
 // The first table contains (x,y) field element pairs for 16 multiples of the
 // base point, G.
 //
-//   Index  |  Index (binary) | Value
-//       0  |           0000  | 0G (all zeros, omitted)
-//       1  |           0001  | G
-//       2  |           0010  | 2⁶⁴G
-//       3  |           0011  | 2⁶⁴G + G
-//       4  |           0100  | 2¹²⁸G
-//       5  |           0101  | 2¹²⁸G + G
-//       6  |           0110  | 2¹²⁸G + 2⁶⁴G
-//       7  |           0111  | 2¹²⁸G + 2⁶⁴G + G
-//       8  |           1000  | 2¹⁹²G
-//       9  |           1001  | 2¹⁹²G + G
-//      10  |           1010  | 2¹⁹²G + 2⁶⁴G
-//      11  |           1011  | 2¹⁹²G + 2⁶⁴G + G
-//      12  |           1100  | 2¹⁹²G + 2¹²⁸G
-//      13  |           1101  | 2¹⁹²G + 2¹²⁸G + G
-//      14  |           1110  | 2¹⁹²G + 2¹²⁸G + 2⁶⁴G
-//      15  |           1111  | 2¹⁹²G + 2¹²⁸G + 2⁶⁴G + G
+//	Index  |  Index (binary) | Value
+//	    0  |           0000  | 0G (all zeros, omitted)
+//	    1  |           0001  | G
+//	    2  |           0010  | 2⁶⁴G
+//	    3  |           0011  | 2⁶⁴G + G
+//	    4  |           0100  | 2¹²⁸G
+//	    5  |           0101  | 2¹²⁸G + G
+//	    6  |           0110  | 2¹²⁸G + 2⁶⁴G
+//	    7  |           0111  | 2¹²⁸G + 2⁶⁴G + G
+//	    8  |           1000  | 2¹⁹²G
+//	    9  |           1001  | 2¹⁹²G + G
+//	   10  |           1010  | 2¹⁹²G + 2⁶⁴G
+//	   11  |           1011  | 2¹⁹²G + 2⁶⁴G + G
+//	   12  |           1100  | 2¹⁹²G + 2¹²⁸G
+//	   13  |           1101  | 2¹⁹²G + 2¹²⁸G + G
+//	   14  |           1110  | 2¹⁹²G + 2¹²⁸G + 2⁶⁴G
+//	   15  |           1111  | 2¹⁹²G + 2¹²⁸G + 2⁶⁴G + G
 //
 // The second table follows the same style, but the terms are 2³²G,
 // 2⁹⁶G, 2¹⁶⁰G, 2²²⁴G.
@@ -211,8 +211,9 @@ var p256Precomputed = [p256Limbs * 2 * 15 * 2]uint32{
 // Field element operations:
 
 // nonZeroToAllOnes returns:
-//   0xffffffff for 0 < x ⩽ 2³¹
-//   0 for x ≡ 0 or x > 2³¹.
+//
+//	0xffffffff for 0 < x ⩽ 2³¹
+//	0 for x ≡ 0 or x > 2³¹.
 func nonZeroToAllOnes(x uint32) uint32 {
 	return ((x - 1) >> 31) - 1
 }
@@ -280,7 +281,9 @@ var p256Zero31 = [p256Limbs]uint32{two31m3, two30m2, two31m2, two30p13m2, two31m
 // p256Diff sets out = in-in2.
 //
 // On entry: in[0,2,...] < 2³⁰, in[1,3,...] < 2²⁹ and
-//           in2[0,2,...] < 2³⁰, in2[1,3,...] < 2²⁹.
+//
+//	in2[0,2,...] < 2³⁰, in2[1,3,...] < 2²⁹.
+//
 // On exit: out[0,2,...] < 2³⁰, out[1,3,...] < 2²⁹.
 func p256Diff(out, in, in2 *[p256Limbs]uint32) {
 	var carry uint32
@@ -560,7 +563,9 @@ func p256Square(out, in *[p256Limbs]uint32) {
 // p256Mul sets out=in*in2.
 //
 // On entry: in[0,2,...] < 2³⁰, in[1,3,...] < 2²⁹ and
-//           in2[0,2,...] < 2³⁰, in2[1,3,...] < 2²⁹.
+//
+//	in2[0,2,...] < 2³⁰, in2[1,3,...] < 2²⁹.
+//
 // On exit: out[0,2,...] < 2³⁰, out[1,3,...] < 2²⁹.
 func p256Mul(out, in, in2 *[p256Limbs]uint32) {
 	var tmp [17]uint64
@@ -659,9 +664,10 @@ func p256Assign(out, in *[p256Limbs]uint32) {
 // p256Invert calculates |out| = |in|⁻¹
 //
 // Based on Fermat's Little Theorem:
-//   aᵖ = a (mod p)
-//   aᵖ⁻¹ = 1 (mod p)
-//   aᵖ⁻² = a⁻¹ (mod p)
+//
+//	aᵖ = a (mod p)
+//	aᵖ⁻¹ = 1 (mod p)
+//	aᵖ⁻² = a⁻¹ (mod p)
 func p256Invert(out, in *[p256Limbs]uint32) {
 	var ftmp, ftmp2 [p256Limbs]uint32
 
