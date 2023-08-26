@@ -58,7 +58,7 @@ Run it through `mathfmt` and voila!
 // Variance computes the population variance of the population xᵢ of size N.
 // Specifically, it computes σ² where
 //
-//		σ² = ∑ (xᵢ - μ)² / N
+//	σ² = ∑ (xᵢ - μ)² / N
 //
 // See also: https://en.wikipedia.org/wiki/Variance.
 func Variance(X []float64) float64 {
