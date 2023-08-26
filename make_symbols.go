@@ -1,6 +1,7 @@
 //go:build ignore
 // +build ignore
 
+// Command make_symbols generates output from a symbol database.
 package main
 
 import (

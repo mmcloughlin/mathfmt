@@ -1,3 +1,4 @@
+// Command mathfmt formats mathematical documentation.
 package main
 
 import (
